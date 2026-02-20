@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Film } from "lucide-react";
+import { Film, Shield } from "lucide-react";
 import HeroSection from "@/components/HeroSection";
 import SearchBar from "@/components/SearchBar";
 import CategoryFilter from "@/components/CategoryFilter";
@@ -33,6 +33,9 @@ const Index = () => {
             <a href="#" className="transition-colors hover:text-foreground">Каталог</a>
             <a href="#" className="transition-colors hover:text-foreground">Новинки</a>
             <a href="#" className="transition-colors hover:text-foreground">Топ 100</a>
+            <a href="/admin" className="transition-colors hover:text-primary">
+              <Shield className="inline h-4 w-4 mr-1" />Админ
+            </a>
           </nav>
         </div>
       </header>
