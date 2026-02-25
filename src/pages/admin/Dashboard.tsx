@@ -1,31 +1,35 @@
+import { useState, useEffect } from "react";
 import { Film, Users, Crown, TrendingUp, DollarSign, Eye } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { movies } from "@/data/movies";
-
-const stats = [
-  { label: "Всего фильмов", value: movies.length, icon: Film, color: "text-primary" },
-  { label: "Пользователей", value: 1284, icon: Users, color: "text-blue-400" },
-  { label: "VIP подписчиков", value: 156, icon: Crown, color: "text-accent" },
-  { label: "Просмотров сегодня", value: "12.4K", icon: Eye, color: "text-green-400" },
-  { label: "Доход (мес.)", value: "$4,280", icon: DollarSign, color: "text-emerald-400" },
-  { label: "Рост", value: "+18%", icon: TrendingUp, color: "text-violet-400" },
-];
-
-const recentUsers = [
-  { name: "Иван Петров", email: "ivan@mail.ru", vip: true, date: "Сегодня" },
-  { name: "Анна Сидорова", email: "anna@gmail.com", vip: false, date: "Вчера" },
-  { name: "Олег Козлов", email: "oleg@ya.ru", vip: true, date: "2 дня назад" },
-  { name: "Мария Иванова", email: "maria@mail.ru", vip: false, date: "3 дня назад" },
-];
+import { supabase } from "@/integrations/supabase/client";
 
 const Dashboard = () => {
+  const [movieCount, setMovieCount] = useState(0);
+  const [userCount, setUserCount] = useState(0);
+  const [vipCount, setVipCount] = useState(0);
+  const [recentUsers, setRecentUsers] = useState<any[]>([]);
+
+  useEffect(() => {
+    supabase.from("movies").select("id", { count: "exact", head: true }).then(({ count }) => setMovieCount(count || 0));
+    supabase.from("app_users").select("id", { count: "exact", head: true }).then(({ count }) => setUserCount(count || 0));
+    supabase.from("app_users").select("id", { count: "exact", head: true }).eq("is_vip", true).then(({ count }) => setVipCount(count || 0));
+    supabase.from("app_users").select("*").order("created_at", { ascending: false }).limit(5).then(({ data }) => {
+      if (data) setRecentUsers(data);
+    });
+  }, []);
+
+  const stats = [
+    { label: "Всего фильмов", value: movieCount, icon: Film, color: "text-primary" },
+    { label: "Пользователей", value: userCount, icon: Users, color: "text-blue-400" },
+    { label: "VIP подписчиков", value: vipCount, icon: Crown, color: "text-accent" },
+  ];
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>
         Дашборд
       </h2>
 
-      {/* Stats grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {stats.map((s) => (
           <Card key={s.label} className="bg-gradient-card border-border">
@@ -42,26 +46,27 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {/* Recent users */}
       <Card className="bg-gradient-card border-border">
         <CardHeader>
           <CardTitle className="text-lg text-foreground">Последние регистрации</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {recentUsers.map((u) => (
-              <div key={u.email} className="flex items-center justify-between rounded-lg bg-secondary/50 px-4 py-3">
+            {recentUsers.map((u: any) => (
+              <div key={u.id} className="flex items-center justify-between rounded-lg bg-secondary/50 px-4 py-3">
                 <div>
-                  <p className="text-sm font-medium text-foreground">{u.name}</p>
-                  <p className="text-xs text-muted-foreground">{u.email}</p>
+                  <p className="text-sm font-medium text-foreground">{u.display_name || "Без имени"}</p>
+                  <p className="text-xs text-muted-foreground">{u.device_id.slice(0, 12)}...</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  {u.vip && (
+                  {u.is_vip && (
                     <span className="flex items-center gap-1 rounded-full bg-accent/20 px-2 py-0.5 text-xs font-medium text-accent">
                       <Crown className="h-3 w-3" /> VIP
                     </span>
                   )}
-                  <span className="text-xs text-muted-foreground">{u.date}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(u.created_at).toLocaleDateString("ru")}
+                  </span>
                 </div>
               </div>
             ))}

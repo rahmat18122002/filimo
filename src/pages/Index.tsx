@@ -1,14 +1,42 @@
-import { useState, useMemo } from "react";
-import { Film, Shield } from "lucide-react";
-import HeroSection from "@/components/HeroSection";
+import { useState, useEffect, useMemo } from "react";
+import { Film } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import HeroSlider from "@/components/HeroSlider";
 import SearchBar from "@/components/SearchBar";
 import CategoryFilter from "@/components/CategoryFilter";
-import MovieCard from "@/components/MovieCard";
-import { movies, type Category } from "@/data/movies";
+import { categories, type Category } from "@/data/movies";
+import { supabase } from "@/integrations/supabase/client";
+import { useAutoRegister } from "@/hooks/useAutoRegister";
+import { motion } from "framer-motion";
+import { Star, Clock } from "lucide-react";
+
+interface DBMovie {
+  id: string;
+  title: string;
+  year: number;
+  rating: number;
+  genre: string[];
+  description: string;
+  poster: string;
+  duration: string;
+}
 
 const Index = () => {
+  const { user } = useAutoRegister();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<Category>("Все");
+  const [movies, setMovies] = useState<DBMovie[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    supabase
+      .from("movies")
+      .select("*")
+      .order("sort_order")
+      .then(({ data }) => {
+        if (data) setMovies(data as DBMovie[]);
+      });
+  }, []);
 
   const filtered = useMemo(() => {
     return movies.filter((m) => {
@@ -16,7 +44,7 @@ const Index = () => {
       const matchesCategory = category === "Все" || m.genre.includes(category);
       return matchesSearch && matchesCategory;
     });
-  }, [search, category]);
+  }, [search, category, movies]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -30,20 +58,17 @@ const Index = () => {
             </span>
           </div>
           <nav className="hidden items-center gap-8 text-sm font-medium text-muted-foreground md:flex">
-            <a href="#" className="transition-colors hover:text-foreground">Каталог</a>
+            <a href="#catalog" className="transition-colors hover:text-foreground">Каталог</a>
             <a href="#" className="transition-colors hover:text-foreground">Новинки</a>
             <a href="#" className="transition-colors hover:text-foreground">Топ 100</a>
-            <a href="/admin" className="transition-colors hover:text-primary">
-              <Shield className="inline h-4 w-4 mr-1" />Админ
-            </a>
           </nav>
         </div>
       </header>
 
-      <HeroSection />
+      <HeroSlider />
 
       {/* Catalog Section */}
-      <main className="container mx-auto px-6 py-12">
+      <main id="catalog" className="container mx-auto px-6 py-12">
         <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <SearchBar value={search} onChange={setSearch} />
           <CategoryFilter selected={category} onSelect={setCategory} />
@@ -52,7 +77,43 @@ const Index = () => {
         {filtered.length > 0 ? (
           <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             {filtered.map((movie, i) => (
-              <MovieCard key={movie.id} movie={movie} index={i} />
+              <motion.div
+                key={movie.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: i * 0.05 }}
+                whileHover={{ y: -8 }}
+                className="group cursor-pointer"
+                onClick={() => navigate(`/movie/${movie.id}`)}
+              >
+                <div className="relative overflow-hidden rounded-2xl shadow-card">
+                  <div className="aspect-[2/3] overflow-hidden rounded-2xl">
+                    <img
+                      src={movie.poster}
+                      alt={movie.title}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-background via-background/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-background/80 px-2.5 py-1 backdrop-blur-sm">
+                    <Star className="h-3 w-3 fill-accent text-accent" />
+                    <span className="text-xs font-semibold text-foreground">{movie.rating}</span>
+                  </div>
+                </div>
+                <div className="mt-3 px-1">
+                  <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-1 group-hover:text-primary transition-colors">
+                    {movie.title}
+                  </h3>
+                  <div className="mt-1.5 flex items-center gap-3 text-xs text-muted-foreground">
+                    <span>{movie.year}</span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      {movie.duration}
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
             ))}
           </div>
         ) : (

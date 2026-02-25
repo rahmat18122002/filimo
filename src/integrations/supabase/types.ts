@@ -14,7 +14,160 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      app_users: {
+        Row: {
+          created_at: string
+          device_id: string
+          display_name: string | null
+          id: string
+          is_vip: boolean
+          vip_until: string | null
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          display_name?: string | null
+          id?: string
+          is_vip?: boolean
+          vip_until?: string | null
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          display_name?: string | null
+          id?: string
+          is_vip?: boolean
+          vip_until?: string | null
+        }
+        Relationships: []
+      }
+      episodes: {
+        Row: {
+          created_at: string
+          duration: string | null
+          id: string
+          is_free: boolean
+          movie_id: string
+          part_number: number
+          title: string
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          duration?: string | null
+          id?: string
+          is_free?: boolean
+          movie_id: string
+          part_number: number
+          title: string
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          duration?: string | null
+          id?: string
+          is_free?: boolean
+          movie_id?: string
+          part_number?: number
+          title?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "episodes_movie_id_fkey"
+            columns: ["movie_id"]
+            isOneToOne: false
+            referencedRelation: "movies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      movies: {
+        Row: {
+          created_at: string
+          description: string
+          duration: string
+          genre: string[]
+          id: string
+          is_featured: boolean
+          poster: string
+          rating: number
+          sort_order: number
+          title: string
+          trailer_url: string | null
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          duration?: string
+          genre?: string[]
+          id?: string
+          is_featured?: boolean
+          poster?: string
+          rating?: number
+          sort_order?: number
+          title: string
+          trailer_url?: string | null
+          year?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          duration?: string
+          genre?: string[]
+          id?: string
+          is_featured?: boolean
+          poster?: string
+          rating?: number
+          sort_order?: number
+          title?: string
+          trailer_url?: string | null
+          year?: number
+        }
+        Relationships: []
+      }
+      slider_items: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          is_active: boolean
+          movie_id: string | null
+          sort_order: number
+          subtitle: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          is_active?: boolean
+          movie_id?: string | null
+          sort_order?: number
+          subtitle?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          movie_id?: string | null
+          sort_order?: number
+          subtitle?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "slider_items_movie_id_fkey"
+            columns: ["movie_id"]
+            isOneToOne: false
+            referencedRelation: "movies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
