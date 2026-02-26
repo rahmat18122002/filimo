@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Film, Plus, Pencil, Trash2, Search, ListVideo } from "lucide-react";
+import { Film, Plus, Pencil, Trash2, Search, ListVideo, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +39,8 @@ const MoviesAdmin = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [editMovie, setEditMovie] = useState<Movie | null>(null);
   const [form, setForm] = useState({ title: "", year: "", rating: "", genre: "", description: "", poster: "", duration: "", trailer_url: "", is_featured: false });
+  const [posterFile, setPosterFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
   
   // Episodes
   const [epOpen, setEpOpen] = useState(false);
@@ -72,22 +74,43 @@ const MoviesAdmin = () => {
     setIsOpen(true);
   };
 
+  const uploadPoster = async (file: File): Promise<string> => {
+    const ext = file.name.split(".").pop();
+    const path = `${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from("posters").upload(path, file);
+    if (error) throw error;
+    const { data } = supabase.storage.from("posters").getPublicUrl(path);
+    return data.publicUrl;
+  };
+
   const handleSave = async () => {
-    const payload = {
-      title: form.title, year: Number(form.year), rating: Number(form.rating),
-      genre: form.genre.split(",").map((g) => g.trim()),
-      description: form.description, poster: form.poster, duration: form.duration,
-      trailer_url: form.trailer_url || null, is_featured: form.is_featured,
-    };
-    if (editMovie) {
-      await supabase.from("movies").update(payload).eq("id", editMovie.id);
-      toast({ title: "Фильм обновлён" });
-    } else {
-      await supabase.from("movies").insert(payload);
-      toast({ title: "Фильм добавлен" });
+    setUploading(true);
+    try {
+      let posterUrl = form.poster;
+      if (posterFile) {
+        posterUrl = await uploadPoster(posterFile);
+      }
+      const payload = {
+        title: form.title, year: Number(form.year), rating: Number(form.rating),
+        genre: form.genre.split(",").map((g) => g.trim()),
+        description: form.description, poster: posterUrl, duration: form.duration,
+        trailer_url: form.trailer_url || null, is_featured: form.is_featured,
+      };
+      if (editMovie) {
+        await supabase.from("movies").update(payload).eq("id", editMovie.id);
+        toast({ title: "Фильм обновлён" });
+      } else {
+        await supabase.from("movies").insert(payload);
+        toast({ title: "Фильм добавлен" });
+      }
+      setIsOpen(false);
+      setPosterFile(null);
+      loadMovies();
+    } catch (e: any) {
+      toast({ title: "Ошибка", description: e.message, variant: "destructive" });
+    } finally {
+      setUploading(false);
     }
-    setIsOpen(false);
-    loadMovies();
   };
 
   const handleDelete = async (id: string) => {
@@ -220,8 +243,23 @@ const MoviesAdmin = () => {
               <Input value={form.genre} onChange={(e) => setForm({ ...form, genre: e.target.value })} className="bg-secondary border-border" />
             </div>
             <div className="grid gap-2">
-              <Label>URL постера</Label>
-              <Input value={form.poster} onChange={(e) => setForm({ ...form, poster: e.target.value })} className="bg-secondary border-border" />
+              <Label>Постер (загрузить из галереи)</Label>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) setPosterFile(file);
+                }}
+                className="bg-secondary border-border"
+              />
+              {(posterFile || form.poster) && (
+                <img
+                  src={posterFile ? URL.createObjectURL(posterFile) : form.poster}
+                  alt="Превью"
+                  className="h-24 w-16 rounded object-cover"
+                />
+              )}
             </div>
             <div className="grid gap-2">
               <Label>URL трейлера (YouTube embed)</Label>
@@ -235,7 +273,8 @@ const MoviesAdmin = () => {
               <Switch checked={form.is_featured} onCheckedChange={(v) => setForm({ ...form, is_featured: v })} />
               <Label>В слайдере на главной</Label>
             </div>
-            <Button onClick={handleSave} className="w-full">
+            <Button onClick={handleSave} className="w-full" disabled={uploading}>
+              {uploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               {editMovie ? "Сохранить" : "Добавить"}
             </Button>
           </div>

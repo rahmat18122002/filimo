@@ -7,6 +7,7 @@ import CategoryFilter from "@/components/CategoryFilter";
 import { categories, type Category } from "@/data/movies";
 import { supabase } from "@/integrations/supabase/client";
 import { useAutoRegister } from "@/hooks/useAutoRegister";
+import { NotificationBell } from "@/components/NotificationBell";
 import { motion } from "framer-motion";
 import { Star, Clock } from "lucide-react";
 
@@ -57,11 +58,14 @@ const Index = () => {
               КиноПоиск
             </span>
           </div>
-          <nav className="hidden items-center gap-8 text-sm font-medium text-muted-foreground md:flex">
-            <a href="#catalog" className="transition-colors hover:text-foreground">Каталог</a>
-            <a href="#" className="transition-colors hover:text-foreground">Новинки</a>
-            <a href="#" className="transition-colors hover:text-foreground">Топ 100</a>
-          </nav>
+          <div className="flex items-center gap-4">
+            {user && <NotificationBell userId={user.id} />}
+            <nav className="hidden items-center gap-8 text-sm font-medium text-muted-foreground md:flex">
+              <a href="#catalog" className="transition-colors hover:text-foreground">Каталог</a>
+              <a href="#" className="transition-colors hover:text-foreground">Новинки</a>
+              <a href="#" className="transition-colors hover:text-foreground">Топ 100</a>
+            </nav>
+          </div>
         </div>
       </header>
 

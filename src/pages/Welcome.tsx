@@ -1,25 +1,45 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Film, UserPlus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { autoRegister } from "@/lib/userStore";
+import { autoRegister, getCurrentUser } from "@/lib/userStore";
 
 const Welcome = () => {
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
   const navigate = useNavigate();
+
+  // Auto-redirect if already registered
+  useEffect(() => {
+    getCurrentUser().then((user) => {
+      if (user) {
+        navigate("/home", { replace: true });
+      } else {
+        setChecking(false);
+      }
+    });
+  }, [navigate]);
 
   const handleRegister = async () => {
     setLoading(true);
     try {
       await autoRegister();
-      navigate("/home");
+      navigate("/home", { replace: true });
     } catch (e) {
       console.error(e);
     } finally {
       setLoading(false);
     }
   };
+
+  if (checking) {
+    return (
+      <div className="flex min-h-svh items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center bg-background px-6">
