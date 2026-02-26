@@ -179,7 +179,7 @@ const MovieDetail = () => {
             <p className="mt-2 text-muted-foreground">
               Части 4 и далее доступны только для VIP-пользователей.
             </p>
-            <Button className="mt-4 gap-2" size="lg">
+            <Button className="mt-4 gap-2" size="lg" onClick={() => navigate("/vip")}>
               <Crown className="h-4 w-4" /> Купить VIP
             </Button>
           </motion.div>

@@ -168,6 +168,105 @@ export type Database = {
           },
         ]
       }
+      vip_cards: {
+        Row: {
+          card_label: string | null
+          card_number: string
+          created_at: string
+          id: string
+          is_active: boolean
+        }
+        Insert: {
+          card_label?: string | null
+          card_number: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+        }
+        Update: {
+          card_label?: string | null
+          card_number?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+        }
+        Relationships: []
+      }
+      vip_payments: {
+        Row: {
+          created_at: string
+          id: string
+          plan_id: string
+          reviewed_at: string | null
+          screenshot_url: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          plan_id: string
+          reviewed_at?: string | null
+          screenshot_url: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          plan_id?: string
+          reviewed_at?: string | null
+          screenshot_url?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vip_payments_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "vip_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vip_payments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vip_plans: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          label: string
+          months: number | null
+          price: number
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label: string
+          months?: number | null
+          price: number
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label?: string
+          months?: number | null
+          price?: number
+          sort_order?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
