@@ -5,6 +5,8 @@ import {
   Film,
   Users,
   Crown,
+  CreditCard,
+  ImageIcon,
   Menu,
   X,
   ChevronLeft,
@@ -17,6 +19,8 @@ const navItems = [
   { to: "/admin/movies", icon: Film, label: "Фильмы" },
   { to: "/admin/users", icon: Users, label: "Пользователи" },
   { to: "/admin/vip", icon: Crown, label: "VIP-подписки" },
+  { to: "/admin/cards", icon: CreditCard, label: "Карты оплаты" },
+  { to: "/admin/payments", icon: ImageIcon, label: "Скриншоты оплат" },
 ];
 
 const AdminLayout = () => {
