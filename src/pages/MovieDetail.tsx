@@ -52,8 +52,13 @@ const MovieDetail = () => {
   const handleEpisodeClick = (ep: Episode) => {
     // Parts 1-3 are free, rest require VIP
     if (ep.part_number <= 3 || userIsVip) {
-      setSelectedEp(ep);
-      setShowVipWall(false);
+      if (ep.video_url) {
+        // Open as external link (Telegram bot, etc.)
+        window.open(ep.video_url, "_blank");
+      } else {
+        setSelectedEp(ep);
+        setShowVipWall(false);
+      }
     } else {
       setShowVipWall(true);
       setSelectedEp(null);

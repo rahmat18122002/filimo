@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
-import { Bell } from "lucide-react";
+import { Bell, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
+
+const ADMIN_PASSWORD = "18122002";
 
 interface Notification {
   id: string;
@@ -18,6 +22,9 @@ interface Notification {
 export function NotificationBell({ userId }: { userId: string }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [password, setPassword] = useState("");
+  const [passError, setPassError] = useState(false);
   const navigate = useNavigate();
 
   const load = () => {
@@ -56,44 +63,93 @@ export function NotificationBell({ userId }: { userId: string }) {
     }
   };
 
+  const handleAdminClick = () => {
+    setOpen(false);
+    setPassword("");
+    setPassError(false);
+    setShowPasswordDialog(true);
+  };
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === ADMIN_PASSWORD) {
+      sessionStorage.setItem("admin_auth", "1");
+      setShowPasswordDialog(false);
+      navigate("/admin");
+    } else {
+      setPassError(true);
+    }
+  };
+
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5 text-muted-foreground" />
-          {unread > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-              {unread}
-            </span>
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-80 p-0 bg-card border-border" align="end">
-        <div className="flex items-center justify-between border-b border-border px-4 py-3">
-          <span className="text-sm font-semibold text-foreground">Уведомления</span>
-          {unread > 0 && (
-            <button onClick={markAllRead} className="text-xs text-primary hover:underline">
-              Прочитать все
-            </button>
-          )}
-        </div>
-        <ScrollArea className="max-h-64">
-          {notifications.length === 0 ? (
-            <p className="p-4 text-center text-sm text-muted-foreground">Нет уведомлений</p>
-          ) : (
-            notifications.map((n) => (
+    <>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button variant="ghost" size="icon" className="relative">
+            <Bell className="h-5 w-5 text-muted-foreground" />
+            {unread > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                {unread}
+              </span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-80 p-0 bg-card border-border" align="end">
+          <div className="flex items-center justify-between border-b border-border px-4 py-3">
+            <span className="text-sm font-semibold text-foreground">Уведомления</span>
+            <div className="flex items-center gap-2">
+              {unread > 0 && (
+                <button onClick={markAllRead} className="text-xs text-primary hover:underline">
+                  Прочитать все
+                </button>
+              )}
               <button
-                key={n.id}
-                onClick={() => handleClick(n)}
-                className={`w-full text-left px-4 py-3 border-b border-border/50 transition-colors hover:bg-secondary/50 ${!n.is_read ? "bg-primary/5" : ""}`}
+                onClick={handleAdminClick}
+                className="text-muted-foreground/20 hover:text-muted-foreground/40 transition-colors"
+                aria-label="settings"
               >
-                <p className="text-sm font-medium text-foreground">{n.title}</p>
-                <p className="text-xs text-muted-foreground line-clamp-2">{n.message}</p>
+                <Settings className="h-3.5 w-3.5" />
               </button>
-            ))
-          )}
-        </ScrollArea>
-      </PopoverContent>
-    </Popover>
+            </div>
+          </div>
+          <ScrollArea className="max-h-64">
+            {notifications.length === 0 ? (
+              <p className="p-4 text-center text-sm text-muted-foreground">Нет уведомлений</p>
+            ) : (
+              notifications.map((n) => (
+                <button
+                  key={n.id}
+                  onClick={() => handleClick(n)}
+                  className={`w-full text-left px-4 py-3 border-b border-border/50 transition-colors hover:bg-secondary/50 ${!n.is_read ? "bg-primary/5" : ""}`}
+                >
+                  <p className="text-sm font-medium text-foreground">{n.title}</p>
+                  <p className="text-xs text-muted-foreground line-clamp-2">{n.message}</p>
+                </button>
+              ))
+            )}
+          </ScrollArea>
+        </PopoverContent>
+      </Popover>
+
+      {/* Hidden admin password dialog */}
+      <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+        <DialogContent className="bg-card border-border max-w-xs">
+          <DialogHeader>
+            <DialogTitle className="text-sm text-muted-foreground">Доступ</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handlePasswordSubmit} className="space-y-3">
+            <Input
+              type="password"
+              value={password}
+              onChange={(e) => { setPassword(e.target.value); setPassError(false); }}
+              placeholder="Пароль"
+              className={`bg-secondary border-border ${passError ? "border-destructive" : ""}`}
+              autoFocus
+            />
+            <Button type="submit" className="w-full" size="sm">Войти</Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
