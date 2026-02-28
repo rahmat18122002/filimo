@@ -305,7 +305,7 @@ const MoviesAdmin = () => {
                 <Input placeholder="Номер" value={epForm.part_number} onChange={(e) => setEpForm({ ...epForm, part_number: e.target.value })} className="bg-secondary border-border" />
                 <Input placeholder="Название" value={epForm.title} onChange={(e) => setEpForm({ ...epForm, title: e.target.value })} className="bg-secondary border-border" />
               </div>
-              <Input placeholder="URL видео" value={epForm.video_url} onChange={(e) => setEpForm({ ...epForm, video_url: e.target.value })} className="bg-secondary border-border" />
+              <Input placeholder="Ссылка (напр. https://t.me/bot?start=...)" value={epForm.video_url} onChange={(e) => setEpForm({ ...epForm, video_url: e.target.value })} className="bg-secondary border-border" />
               <div className="flex items-center gap-3">
                 <Input placeholder="Длительность" value={epForm.duration} onChange={(e) => setEpForm({ ...epForm, duration: e.target.value })} className="bg-secondary border-border flex-1" />
                 <div className="flex items-center gap-2">
