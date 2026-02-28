@@ -17,6 +17,7 @@ import UsersAdmin from "./pages/admin/UsersAdmin";
 import VipAdmin from "./pages/admin/VipAdmin";
 import CardsAdmin from "./pages/admin/CardsAdmin";
 import PaymentsAdmin from "./pages/admin/PaymentsAdmin";
+import SliderAdmin from "./pages/admin/SliderAdmin";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="vip" element={<VipAdmin />} />
             <Route path="cards" element={<CardsAdmin />} />
             <Route path="payments" element={<PaymentsAdmin />} />
+            <Route path="slider" element={<SliderAdmin />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
