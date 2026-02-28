@@ -105,7 +105,7 @@ export function NotificationBell({ userId }: { userId: string }) {
               )}
               <button
                 onClick={handleAdminClick}
-                className="text-muted-foreground/20 hover:text-muted-foreground/40 transition-colors"
+                className="opacity-0 w-4 h-4 cursor-default"
                 aria-label="settings"
               >
                 <Settings className="h-3.5 w-3.5" />
