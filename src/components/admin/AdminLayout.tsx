@@ -21,6 +21,7 @@ const navItems = [
   { to: "/admin/vip", icon: Crown, label: "VIP-подписки" },
   { to: "/admin/cards", icon: CreditCard, label: "Карты оплаты" },
   { to: "/admin/payments", icon: ImageIcon, label: "Скриншоты оплат" },
+  { to: "/admin/slider", icon: ImageIcon, label: "Слайдер" },
 ];
 
 const AdminLayout = () => {
