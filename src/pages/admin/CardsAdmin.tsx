@@ -60,7 +60,7 @@ const CardsAdmin = () => {
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
               <Label className="text-xs text-muted-foreground">Номер карты</Label>
-              <Input value={number} onChange={(e) => setNumber(e.target.value)} placeholder="0000 0000 0000 0000" className="bg-secondary border-border mt-1" />
+              <Input value={number} onChange={(e) => setNumber(e.target.value)} placeholder="8 900 123 45 67 или 0000 0000 0000 0000" className="bg-secondary border-border mt-1" />
             </div>
             <div>
               <Label className="text-xs text-muted-foreground">Подпись (опционально)</Label>

@@ -7,6 +7,7 @@ import {
   Crown,
   CreditCard,
   ImageIcon,
+  Settings,
   Menu,
   X,
   ChevronLeft,
@@ -22,6 +23,7 @@ const navItems = [
   { to: "/admin/cards", icon: CreditCard, label: "Карты оплаты" },
   { to: "/admin/payments", icon: ImageIcon, label: "Скриншоты оплат" },
   { to: "/admin/slider", icon: ImageIcon, label: "Слайдер" },
+  { to: "/admin/settings", icon: Settings, label: "Настройки" },
 ];
 
 const AdminLayout = () => {
