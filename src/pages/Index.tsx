@@ -120,14 +120,23 @@ const Index = () => {
                       {movie.title}
                     </h3>
                     <button
-                      onClick={(e) => {
+                      onClick={async (e) => {
                         e.stopPropagation();
                         const url = `${window.location.origin}/movie/${movie.id}`;
-                        if (navigator.share) {
-                          navigator.share({ title: movie.title, text: `Смотри фильм: ${movie.title}`, url });
-                        } else {
-                          navigator.clipboard.writeText(url);
-                          toast({ title: "Ссылка скопирована!" });
+                        try {
+                          if (navigator.share) {
+                            await navigator.share({ title: movie.title, text: `Смотри фильм: ${movie.title}`, url });
+                          } else {
+                            await navigator.clipboard.writeText(url);
+                            toast({ title: "Ссылка скопирована!" });
+                          }
+                        } catch {
+                          try {
+                            await navigator.clipboard.writeText(url);
+                            toast({ title: "Ссылка скопирована!" });
+                          } catch {
+                            toast({ title: "Ссылка", description: url });
+                          }
                         }
                       }}
                       className="ml-2 shrink-0 rounded-full p-1 text-muted-foreground transition-colors hover:text-primary hover:bg-primary/10"
