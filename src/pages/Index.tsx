@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Film } from "lucide-react";
+import { Film, Star, Clock, Share2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import HeroSlider from "@/components/HeroSlider";
 import SearchBar from "@/components/SearchBar";
@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAutoRegister } from "@/hooks/useAutoRegister";
 import { NotificationBell } from "@/components/NotificationBell";
 import { motion } from "framer-motion";
-import { Star, Clock } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 interface DBMovie {
   id: string;
@@ -91,13 +91,22 @@ const Index = () => {
                 onClick={() => navigate(`/movie/${movie.id}`)}
               >
                 <div className="relative overflow-hidden rounded-2xl shadow-card">
-                  <div className="aspect-[2/3] overflow-hidden rounded-2xl">
-                    <img
-                      src={movie.poster}
-                      alt={movie.title}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      loading="lazy"
-                    />
+                  <div className="aspect-[2/3] overflow-hidden rounded-2xl bg-secondary">
+                    {movie.poster ? (
+                      <img
+                        src={movie.poster}
+                        alt={movie.title}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        loading="lazy"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center">
+                        <Film className="h-10 w-10 text-muted-foreground" />
+                      </div>
+                    )}
                   </div>
                   <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-background via-background/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-background/80 px-2.5 py-1 backdrop-blur-sm">
@@ -106,9 +115,27 @@ const Index = () => {
                   </div>
                 </div>
                 <div className="mt-3 px-1">
-                  <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-1 group-hover:text-primary transition-colors">
-                    {movie.title}
-                  </h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-1 group-hover:text-primary transition-colors flex-1">
+                      {movie.title}
+                    </h3>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const url = `${window.location.origin}/movie/${movie.id}`;
+                        if (navigator.share) {
+                          navigator.share({ title: movie.title, text: `Смотри фильм: ${movie.title}`, url });
+                        } else {
+                          navigator.clipboard.writeText(url);
+                          toast({ title: "Ссылка скопирована!" });
+                        }
+                      }}
+                      className="ml-2 shrink-0 rounded-full p-1 text-muted-foreground transition-colors hover:text-primary hover:bg-primary/10"
+                      title="Поделиться"
+                    >
+                      <Share2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                   <div className="mt-1.5 flex items-center gap-3 text-xs text-muted-foreground">
                     <span>{movie.year}</span>
                     <span className="flex items-center gap-1">
