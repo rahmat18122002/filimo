@@ -11,6 +11,7 @@ import {
   Menu,
   X,
   ChevronLeft,
+  Tag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import { Button } from "@/components/ui/button";
 const navItems = [
   { to: "/admin", icon: LayoutDashboard, label: "Дашборд", end: true },
   { to: "/admin/movies", icon: Film, label: "Фильмы" },
+  { to: "/admin/categories", icon: Tag, label: "Категории" },
   { to: "/admin/users", icon: Users, label: "Пользователи" },
   { to: "/admin/vip", icon: Crown, label: "VIP-подписки" },
   { to: "/admin/cards", icon: CreditCard, label: "Карты оплаты" },
