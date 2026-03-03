@@ -39,7 +39,7 @@ const MovieCarousel = ({ movies, carouselSpeed }: { movies: DBMovie[]; carouselS
 
   // Auto-scroll right to left
   useEffect(() => {
-    if (movies.length <= 3 || carouselSpeed <= 0) return;
+    if (movies.length < 2 || carouselSpeed <= 0) return;
     intervalRef.current = setInterval(() => {
       if (!scrollRef.current) return;
       const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
@@ -65,7 +65,7 @@ const MovieCarousel = ({ movies, carouselSpeed }: { movies: DBMovie[]; carouselS
         className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth px-1 py-2"
         onMouseEnter={() => clearInterval(intervalRef.current)}
         onMouseLeave={() => {
-          if (movies.length <= 3 || carouselSpeed <= 0) return;
+          if (movies.length < 2 || carouselSpeed <= 0) return;
           intervalRef.current = setInterval(() => {
             if (!scrollRef.current) return;
             const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;

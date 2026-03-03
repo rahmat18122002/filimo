@@ -55,6 +55,11 @@ export function NotificationBell({ userId }: { userId: string }) {
     load();
   };
 
+  const clearAll = async () => {
+    await supabase.from("notifications").delete().eq("user_id", userId);
+    setNotifications([]);
+  };
+
   const handleClick = (n: Notification) => {
     supabase.from("notifications").update({ is_read: true }).eq("id", n.id).then(() => load());
     if (n.movie_id) {
@@ -101,6 +106,11 @@ export function NotificationBell({ userId }: { userId: string }) {
               {unread > 0 && (
                 <button onClick={markAllRead} className="text-xs text-primary hover:underline">
                   Прочитать все
+                </button>
+              )}
+              {notifications.length > 0 && (
+                <button onClick={clearAll} className="text-xs text-destructive hover:underline">
+                  Очистить
                 </button>
               )}
               <button
