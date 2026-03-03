@@ -19,6 +19,7 @@ import CardsAdmin from "./pages/admin/CardsAdmin";
 import PaymentsAdmin from "./pages/admin/PaymentsAdmin";
 import SliderAdmin from "./pages/admin/SliderAdmin";
 import SettingsAdmin from "./pages/admin/SettingsAdmin";
+import CategoriesAdmin from "./pages/admin/CategoriesAdmin";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/admin" element={<AdminGuard><AdminLayout /></AdminGuard>}>
             <Route index element={<Dashboard />} />
             <Route path="movies" element={<MoviesAdmin />} />
+            <Route path="categories" element={<CategoriesAdmin />} />
             <Route path="users" element={<UsersAdmin />} />
             <Route path="vip" element={<VipAdmin />} />
             <Route path="cards" element={<CardsAdmin />} />
