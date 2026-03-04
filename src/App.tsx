@@ -20,6 +20,7 @@ import PaymentsAdmin from "./pages/admin/PaymentsAdmin";
 import SliderAdmin from "./pages/admin/SliderAdmin";
 import SettingsAdmin from "./pages/admin/SettingsAdmin";
 import CategoriesAdmin from "./pages/admin/CategoriesAdmin";
+import TelegramBotAdmin from "./pages/admin/TelegramBotAdmin";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="payments" element={<PaymentsAdmin />} />
             <Route path="slider" element={<SliderAdmin />} />
             <Route path="settings" element={<SettingsAdmin />} />
+            <Route path="telegram-bot" element={<TelegramBotAdmin />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

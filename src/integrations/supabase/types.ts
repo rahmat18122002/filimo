@@ -62,6 +62,98 @@ export type Database = {
         }
         Relationships: []
       }
+      bot_channels: {
+        Row: {
+          channel_type: string
+          chat_id: string
+          created_at: string
+          id: string
+          invite_link: string | null
+          is_active: boolean
+          sort_order: number
+          title: string
+          username: string | null
+        }
+        Insert: {
+          channel_type?: string
+          chat_id: string
+          created_at?: string
+          id?: string
+          invite_link?: string | null
+          is_active?: boolean
+          sort_order?: number
+          title: string
+          username?: string | null
+        }
+        Update: {
+          channel_type?: string
+          chat_id?: string
+          created_at?: string
+          id?: string
+          invite_link?: string | null
+          is_active?: boolean
+          sort_order?: number
+          title?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      bot_settings: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      bot_stats: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          movie_id: string | null
+          telegram_user_id: string
+          telegram_username: string | null
+        }
+        Insert: {
+          action?: string
+          created_at?: string
+          id?: string
+          movie_id?: string | null
+          telegram_user_id: string
+          telegram_username?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          movie_id?: string | null
+          telegram_user_id?: string
+          telegram_username?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bot_stats_movie_id_fkey"
+            columns: ["movie_id"]
+            isOneToOne: false
+            referencedRelation: "movies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string
