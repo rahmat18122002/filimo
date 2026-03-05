@@ -4,13 +4,14 @@ import { motion } from "framer-motion";
 import { Film, UserPlus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { autoRegister, getCurrentUser } from "@/lib/userStore";
+import { supabase } from "@/integrations/supabase/client";
 
 const Welcome = () => {
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [appName, setAppName] = useState("Filimo");
   const navigate = useNavigate();
 
-  // Auto-redirect if already registered
   useEffect(() => {
     getCurrentUser().then((user) => {
       if (user) {
@@ -18,6 +19,9 @@ const Welcome = () => {
       } else {
         setChecking(false);
       }
+    });
+    supabase.from("app_settings").select("*").eq("key", "app_name").single().then(({ data }) => {
+      if (data) setAppName((data as any).value || "Filimo");
     });
   }, [navigate]);
 
@@ -56,7 +60,7 @@ const Welcome = () => {
           className="text-3xl font-bold text-foreground sm:text-4xl"
           style={{ fontFamily: "'Playfair Display', serif" }}
         >
-          КиноПоиск
+          {appName}
         </h1>
         <p className="mt-3 max-w-xs text-muted-foreground">
           Лучшие фильмы и сериалы — всё в одном приложении

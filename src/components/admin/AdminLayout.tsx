@@ -12,7 +12,6 @@ import {
   X,
   ChevronLeft,
   Tag,
-  Bot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -26,7 +25,7 @@ const navItems = [
   { to: "/admin/cards", icon: CreditCard, label: "Карты оплаты" },
   { to: "/admin/payments", icon: ImageIcon, label: "Скриншоты оплат" },
   { to: "/admin/slider", icon: ImageIcon, label: "Слайдер" },
-  { to: "/admin/telegram-bot", icon: Bot, label: "Telegram-бот" },
+  
   { to: "/admin/settings", icon: Settings, label: "Настройки" },
 ];
 

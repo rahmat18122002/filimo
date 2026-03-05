@@ -167,6 +167,7 @@ const Index = () => {
   const [movies, setMovies] = useState<DBMovie[]>([]);
   const [categories, setCategories] = useState<DBCategory[]>([]);
   const [carouselSpeed, setCarouselSpeed] = useState(5);
+  const [appName, setAppName] = useState("Filimo");
   const navigate = useNavigate();
 
   const loadData = useCallback(() => {
@@ -178,6 +179,9 @@ const Index = () => {
     });
     supabase.from("app_settings").select("*").eq("key", "carousel_speed").single().then(({ data }) => {
       if (data) setCarouselSpeed(Number((data as any).value) || 5);
+    });
+    supabase.from("app_settings").select("*").eq("key", "app_name").single().then(({ data }) => {
+      if (data) setAppName((data as any).value || "Filimo");
     });
   }, []);
 
@@ -207,7 +211,7 @@ const Index = () => {
           <div className="flex items-center gap-2.5">
             <Film className="h-7 w-7 text-primary" />
             <span className="text-xl font-bold text-foreground tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
-              КиноПоиск
+              {appName}
             </span>
           </div>
           <div className="flex items-center gap-4">
