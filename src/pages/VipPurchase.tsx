@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Crown, CreditCard, Upload, Check, Loader2, Copy } from "lucide-react";
+import { ArrowLeft, Crown, CreditCard, Upload, Check, Loader2, Copy, Timer } from "lucide-react";
+import { isVip } from "@/lib/userStore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
@@ -97,6 +98,32 @@ const VipPurchase = () => {
       </header>
 
       <div className="px-4 space-y-6">
+        {/* VIP Status */}
+        {user && isVip(user) && (
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+            <Card className="border-accent/30 bg-accent/10">
+              <CardContent className="flex items-center gap-4 p-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/20">
+                  <Crown className="h-6 w-6 text-accent" />
+                </div>
+                <div>
+                  <p className="font-bold text-foreground">У вас активен VIP</p>
+                  {user.vip_until ? (
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <Timer className="h-3.5 w-3.5 text-accent" />
+                      <span className="text-sm text-accent font-semibold">
+                        Осталось {Math.max(0, Math.ceil((new Date(user.vip_until).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} дней
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-sm text-accent font-semibold">Навсегда ∞</span>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
         {/* Plans */}
         <div className="space-y-3">
           <h2 className="text-sm font-medium text-muted-foreground">Выберите план</h2>
