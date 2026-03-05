@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { Film, Star, Clock, Share2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Film, Star, Clock, Share2, ChevronLeft, ChevronRight, Crown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { isVip } from "@/lib/userStore";
 import HeroSlider from "@/components/HeroSlider";
 import SearchBar from "@/components/SearchBar";
 import { supabase } from "@/integrations/supabase/client";
@@ -215,6 +216,32 @@ const Index = () => {
             </span>
           </div>
           <div className="flex items-center gap-4">
+            {user && isVip(user) && user.vip_until && (
+              <div
+                className="flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1.5 cursor-pointer"
+                onClick={() => navigate("/vip")}
+              >
+                <Crown className="h-4 w-4 text-accent" />
+                <span className="text-xs font-bold text-accent">
+                  VIP — {Math.max(0, Math.ceil((new Date(user.vip_until).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} дн.
+                </span>
+              </div>
+            )}
+            {user && isVip(user) && !user.vip_until && (
+              <div className="flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1.5">
+                <Crown className="h-4 w-4 text-accent" />
+                <span className="text-xs font-bold text-accent">VIP ∞</span>
+              </div>
+            )}
+            {user && !isVip(user) && (
+              <div
+                className="flex items-center gap-1.5 rounded-full border border-accent/30 px-3 py-1.5 cursor-pointer transition-colors hover:bg-accent/10"
+                onClick={() => navigate("/vip")}
+              >
+                <Crown className="h-4 w-4 text-muted-foreground" />
+                <span className="text-xs font-medium text-muted-foreground">VIP</span>
+              </div>
+            )}
             {user && <NotificationBell userId={user.id} />}
             <nav className="hidden items-center gap-8 text-sm font-medium text-muted-foreground md:flex">
               <a href="#catalog" className="transition-colors hover:text-foreground">Каталог</a>
