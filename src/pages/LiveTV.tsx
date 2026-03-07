@@ -1,34 +1,42 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Radio, Lock, Tv } from "lucide-react";
+import { ArrowLeft, Radio, Lock, Tv, Satellite, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAutoRegister } from "@/hooks/useAutoRegister";
 import { isVip } from "@/lib/userStore";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Channel {
   id: string;
   name: string;
-  logo: string;
-  url: string;
+  logo_url: string;
+  stream_url: string;
   category: string;
+  source: string;
 }
-
-const SPUTNIK_CHANNELS: Channel[] = [
-  { id: "gem", name: "Gem TV", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/6/6e/GEM_TV_logo.svg/1200px-GEM_TV_logo.svg.png", url: "https://d1ds1gsmxwj9cw.cloudfront.net/live/gem-tv/playlist.m3u8", category: "Развлечения" },
-  { id: "iran-international", name: "Iran International", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/8/84/Iran_International_logo.svg/1200px-Iran_International_logo.svg.png", url: "https://d1ds1gsmxwj9cw.cloudfront.net/live/iran-international/playlist.m3u8", category: "Новости" },
-  { id: "manoto", name: "Manoto", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/a/a0/Manoto_TV_logo.svg/1200px-Manoto_TV_logo.svg.png", url: "https://d1ds1gsmxwj9cw.cloudfront.net/live/manoto/playlist.m3u8", category: "Развлечения" },
-  { id: "bbc-persian", name: "BBC Persian", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/f/fb/BBC_Persian_logo.svg/1200px-BBC_Persian_logo.svg.png", url: "https://d1ds1gsmxwj9cw.cloudfront.net/live/bbc-persian/playlist.m3u8", category: "Новости" },
-  { id: "gem-series", name: "Gem Series", logo: "https://upload.wikimedia.org/wikipedia/en/6/6e/GEM_TV_logo.svg", url: "https://d1ds1gsmxwj9cw.cloudfront.net/live/gem-series/playlist.m3u8", category: "Сериалы" },
-  { id: "gem-classic", name: "Gem Classic", logo: "https://upload.wikimedia.org/wikipedia/en/6/6e/GEM_TV_logo.svg", url: "https://d1ds1gsmxwj9cw.cloudfront.net/live/gem-classic/playlist.m3u8", category: "Классика" },
-  { id: "gem-kids", name: "Gem Kids", logo: "https://upload.wikimedia.org/wikipedia/en/6/6e/GEM_TV_logo.svg", url: "https://d1ds1gsmxwj9cw.cloudfront.net/live/gem-kids/playlist.m3u8", category: "Детям" },
-  { id: "pmc", name: "PMC", logo: "https://upload.wikimedia.org/wikipedia/en/6/6e/GEM_TV_logo.svg", url: "https://d1ds1gsmxwj9cw.cloudfront.net/live/pmc/playlist.m3u8", category: "Музыка" },
-];
 
 const LiveTV = () => {
   const { user } = useAutoRegister();
   const navigate = useNavigate();
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
+  const [channels, setChannels] = useState<Channel[]>([]);
+  const [loading, setLoading] = useState(true);
   const userIsVip = isVip(user);
+
+  useEffect(() => {
+    if (userIsVip) fetchChannels();
+  }, [userIsVip]);
+
+  const fetchChannels = async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("live_channels")
+      .select("*")
+      .eq("is_active", true)
+      .order("sort_order");
+    setChannels((data as Channel[]) || []);
+    setLoading(false);
+  };
 
   if (!userIsVip) {
     return (
@@ -58,7 +66,7 @@ const LiveTV = () => {
     );
   }
 
-  const categories = [...new Set(SPUTNIK_CHANNELS.map(c => c.category))];
+  const categories = [...new Set(channels.map(c => c.category))];
 
   return (
     <div className="min-h-screen bg-background">
@@ -75,6 +83,10 @@ const LiveTV = () => {
             </div>
             <h1 className="text-lg font-bold text-foreground">Live TV</h1>
           </div>
+          <div className="ml-auto flex items-center gap-1.5 rounded-full bg-secondary/80 px-3 py-1.5">
+            <Satellite className="h-4 w-4 text-primary" />
+            <span className="text-xs font-medium text-muted-foreground">Sputnik 🛰️</span>
+          </div>
         </div>
       </header>
 
@@ -88,17 +100,18 @@ const LiveTV = () => {
           <div className="container mx-auto">
             <div className="aspect-video w-full max-w-4xl mx-auto">
               <video
-                key={selectedChannel.url}
+                key={selectedChannel.stream_url}
                 controls
                 autoPlay
                 className="h-full w-full"
-                src={selectedChannel.url}
+                src={selectedChannel.stream_url}
               >
                 Ваш браузер не поддерживает видео
               </video>
             </div>
             <div className="px-6 py-3 text-center">
               <p className="text-sm font-semibold text-white">{selectedChannel.name}</p>
+              <p className="text-xs text-white/50">🛰️ Sputnik • {selectedChannel.category}</p>
             </div>
           </div>
         </motion.div>
@@ -106,38 +119,64 @@ const LiveTV = () => {
 
       {/* Channel Grid */}
       <main className="container mx-auto px-6 py-8">
-        {categories.map(cat => (
-          <section key={cat} className="mb-8">
-            <h2 className="mb-4 text-lg font-bold text-foreground">{cat}</h2>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-              {SPUTNIK_CHANNELS.filter(c => c.category === cat).map((channel, i) => (
-                <motion.div
-                  key={channel.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.05 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setSelectedChannel(channel)}
-                  className={`cursor-pointer rounded-2xl border p-4 text-center transition-all ${
-                    selectedChannel?.id === channel.id
-                      ? "border-primary bg-primary/10 shadow-lg"
-                      : "border-border bg-card hover:border-primary/50"
-                  }`}
-                >
-                  <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-xl bg-secondary">
-                    <Tv className="h-8 w-8 text-primary" />
-                  </div>
-                  <p className="text-sm font-semibold text-foreground line-clamp-1">{channel.name}</p>
-                  <div className="mt-1 flex items-center justify-center gap-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-destructive animate-pulse" />
-                    <span className="text-xs text-muted-foreground">Live</span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </section>
-        ))}
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20 gap-3">
+            <RefreshCw className="h-8 w-8 text-primary animate-spin" />
+            <p className="text-sm text-muted-foreground">Загрузка каналов со спутника...</p>
+          </div>
+        ) : channels.length === 0 ? (
+          <div className="text-center py-20">
+            <Satellite className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+            <p className="text-muted-foreground">Каналы не найдены</p>
+          </div>
+        ) : (
+          categories.map(cat => (
+            <section key={cat} className="mb-8">
+              <h2 className="mb-4 text-lg font-bold text-foreground flex items-center gap-2">
+                <Satellite className="h-4 w-4 text-primary" />
+                {cat}
+              </h2>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                {channels.filter(c => c.category === cat).map((channel, i) => (
+                  <motion.div
+                    key={channel.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: i * 0.05 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setSelectedChannel(channel)}
+                    className={`cursor-pointer rounded-2xl border p-4 text-center transition-all ${
+                      selectedChannel?.id === channel.id
+                        ? "border-primary bg-primary/10 shadow-lg"
+                        : "border-border bg-card hover:border-primary/50"
+                    }`}
+                  >
+                    <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-xl bg-secondary overflow-hidden">
+                      {channel.logo_url ? (
+                        <img
+                          src={channel.logo_url}
+                          alt={channel.name}
+                          className="h-12 w-12 object-contain"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = "none";
+                            (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
+                          }}
+                        />
+                      ) : null}
+                      <Tv className={`h-8 w-8 text-primary ${channel.logo_url ? "hidden" : ""}`} />
+                    </div>
+                    <p className="text-sm font-semibold text-foreground line-clamp-1">{channel.name}</p>
+                    <div className="mt-1 flex items-center justify-center gap-1">
+                      <span className="h-1.5 w-1.5 rounded-full bg-destructive animate-pulse" />
+                      <span className="text-xs text-muted-foreground">Live</span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </section>
+          ))
+        )}
       </main>
     </div>
   );
