@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import MovieDetail from "./pages/MovieDetail";
 import VipPurchase from "./pages/VipPurchase";
+import LiveTV from "./pages/LiveTV";
 import AdminLogin from "./pages/AdminLogin";
 import AdminGuard from "./components/AdminGuard";
 import AdminLayout from "./components/admin/AdminLayout";
@@ -35,6 +36,7 @@ const App = () => (
           <Route path="/home" element={<Index />} />
           <Route path="/movie/:id" element={<MovieDetail />} />
           <Route path="/vip" element={<VipPurchase />} />
+          <Route path="/live" element={<LiveTV />} />
           <Route path="/gate" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminGuard><AdminLayout /></AdminGuard>}>
             <Route index element={<Dashboard />} />
