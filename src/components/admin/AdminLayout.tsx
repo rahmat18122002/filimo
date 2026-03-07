@@ -12,6 +12,7 @@ import {
   X,
   ChevronLeft,
   Tag,
+  Satellite,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -25,7 +26,7 @@ const navItems = [
   { to: "/admin/cards", icon: CreditCard, label: "Карты оплаты" },
   { to: "/admin/payments", icon: ImageIcon, label: "Скриншоты оплат" },
   { to: "/admin/slider", icon: ImageIcon, label: "Слайдер" },
-  
+  { to: "/admin/live-channels", icon: Satellite, label: "🛰️ Live TV" },
   { to: "/admin/settings", icon: Settings, label: "Настройки" },
 ];
 
