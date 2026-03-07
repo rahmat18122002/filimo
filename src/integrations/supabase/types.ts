@@ -219,6 +219,42 @@ export type Database = {
           },
         ]
       }
+      live_channels: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          is_active: boolean
+          logo_url: string
+          name: string
+          sort_order: number
+          source: string
+          stream_url: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string
+          name: string
+          sort_order?: number
+          source?: string
+          stream_url?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string
+          name?: string
+          sort_order?: number
+          source?: string
+          stream_url?: string
+        }
+        Relationships: []
+      }
       movies: {
         Row: {
           created_at: string

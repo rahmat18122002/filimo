@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX live_channels_name_source_idx ON public.live_channels (name, source);
