@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { Film, Star, Clock, Share2, ChevronLeft, ChevronRight, Crown } from "lucide-react";
+import { Film, Star, Clock, Share2, ChevronLeft, ChevronRight, Crown, Radio } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { isVip } from "@/lib/userStore";
 import HeroSlider from "@/components/HeroSlider";
@@ -242,6 +242,30 @@ const Index = () => {
                 <span className="text-xs font-medium text-muted-foreground">VIP</span>
               </div>
             )}
+            {/* Live TV Button */}
+            <motion.button
+              onClick={() => {
+                if (user && isVip(user)) {
+                  navigate("/live");
+                } else {
+                  navigate("/vip");
+                  toast({ title: "Только для VIP", description: "Купите VIP для доступа к Live TV" });
+                }
+              }}
+              className={`relative flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all ${
+                user && isVip(user)
+                  ? "bg-destructive/15 text-destructive border border-destructive/30 hover:bg-destructive/25"
+                  : "bg-secondary text-muted-foreground border border-border"
+              }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-destructive" />
+              </span>
+              Live
+            </motion.button>
             {user && <NotificationBell userId={user.id} />}
             <nav className="hidden items-center gap-8 text-sm font-medium text-muted-foreground md:flex">
               <a href="#catalog" className="transition-colors hover:text-foreground">Каталог</a>
