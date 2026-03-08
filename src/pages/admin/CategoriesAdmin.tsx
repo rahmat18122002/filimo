@@ -38,9 +38,7 @@ const CategoriesAdmin = () => {
   useEffect(() => { load(); }, []);
 
   const openNew = () => {
-    setEditCat(null);
-    setForm({ name: "", sort_order: String(categories.length), is_active: true });
-    setIsOpen(true);
+    setForm({ name: "", name_en: "", name_tg: "", name_fa: "", sort_order: String(categories.length), is_active: true });
   };
 
   const openEdit = (c: Category) => {
