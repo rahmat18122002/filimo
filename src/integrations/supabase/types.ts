@@ -388,6 +388,8 @@ export type Database = {
       }
       stories: {
         Row: {
+          button_label: string | null
+          button_url: string | null
           created_at: string
           expires_at: string | null
           id: string
@@ -399,6 +401,8 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          button_label?: string | null
+          button_url?: string | null
           created_at?: string
           expires_at?: string | null
           id?: string
@@ -410,6 +414,8 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          button_label?: string | null
+          button_url?: string | null
           created_at?: string
           expires_at?: string | null
           id?: string

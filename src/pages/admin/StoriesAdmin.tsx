@@ -22,7 +22,7 @@ const StoriesAdmin = () => {
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [form, setForm] = useState({ title: "", image_url: "", movie_id: "" });
+  const [form, setForm] = useState({ title: "", image_url: "", movie_id: "", button_url: "", button_label: "" });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const { toast } = useToast();
@@ -73,10 +73,12 @@ const StoriesAdmin = () => {
         image_url: imageUrl,
         video_url: videoUrl,
         movie_id: form.movie_id || null,
+        button_url: form.button_url || null,
+        button_label: form.button_label || "Подробнее",
         sort_order: stories.length,
       });
       if (insertError) throw insertError;
-      setForm({ title: "", image_url: "", movie_id: "" });
+      setForm({ title: "", image_url: "", movie_id: "", button_url: "", button_label: "" });
       setImageFile(null);
       setVideoFile(null);
       fetchStories();
@@ -131,6 +133,14 @@ const StoriesAdmin = () => {
             <div>
               <Label>Или URL изображения</Label>
               <Input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://..." />
+            </div>
+            <div>
+              <Label>🔗 URL кнопки (опционально)</Label>
+              <Input value={form.button_url} onChange={(e) => setForm({ ...form, button_url: e.target.value })} placeholder="https://example.com" />
+            </div>
+            <div>
+              <Label>📝 Текст кнопки</Label>
+              <Input value={form.button_label} onChange={(e) => setForm({ ...form, button_label: e.target.value })} placeholder="Подробнее" />
             </div>
           </div>
           <Button onClick={addStory} disabled={uploading} className="gap-2">
