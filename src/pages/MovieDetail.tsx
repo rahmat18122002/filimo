@@ -5,6 +5,7 @@ import { ArrowLeft, Play, Lock, Crown, Star, Clock, Film } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { autoRegister, isVip, type AppUser } from "@/lib/userStore";
+import { useI18n, getLocalizedField } from "@/lib/i18n";
 
 interface Movie {
   id: string;
