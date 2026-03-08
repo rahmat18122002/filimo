@@ -19,7 +19,7 @@ const Stories = () => {
   const [progress, setProgress] = useState(0);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const fetchStories = () => {
     supabase
       .from("stories")
       .select("*")
@@ -28,6 +28,12 @@ const Stories = () => {
       .then(({ data }) => {
         if (data) setStories(data as Story[]);
       });
+  };
+
+  useEffect(() => {
+    fetchStories();
+    const interval = setInterval(fetchStories, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   // Auto-progress when viewing
