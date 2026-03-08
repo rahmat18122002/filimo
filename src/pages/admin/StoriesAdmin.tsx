@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Trash2, Plus, BookOpen, Loader2 } from "lucide-react";
+import { Trash2, Plus, BookOpen, Loader2, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Story {
@@ -20,6 +20,7 @@ interface Story {
 
 const StoriesAdmin = () => {
   const [stories, setStories] = useState<Story[]>([]);
+  const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({ title: "", image_url: "", movie_id: "", button_url: "", button_label: "" });
@@ -32,7 +33,22 @@ const StoriesAdmin = () => {
   const fetchStories = async () => {
     setLoading(true);
     const { data } = await supabase.from("stories").select("*").order("sort_order");
-    setStories((data as Story[]) || []);
+    const storiesData = (data as Story[]) || [];
+    setStories(storiesData);
+
+    // Fetch view counts for each story
+    if (storiesData.length > 0) {
+      const counts: Record<string, number> = {};
+      for (const s of storiesData) {
+        const { count } = await supabase
+          .from("story_views")
+          .select("id", { count: "exact", head: true })
+          .eq("story_id", s.id);
+        counts[s.id] = count || 0;
+      }
+      setViewCounts(counts);
+    }
+
     setLoading(false);
   };
 
@@ -163,6 +179,10 @@ const StoriesAdmin = () => {
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm truncate">{s.title}</p>
                   <p className="text-xs text-muted-foreground">{s.movie_id ? "Ведёт к фильму" : "Без ссылки"}</p>
+                </div>
+                <div className="flex items-center gap-1.5 text-muted-foreground shrink-0">
+                  <Eye className="h-4 w-4" />
+                  <span className="text-sm font-medium">{viewCounts[s.id] || 0}</span>
                 </div>
                 <Switch checked={s.is_active} onCheckedChange={(v) => toggleActive(s.id, v)} />
                 <Button variant="ghost" size="icon" onClick={() => deleteStory(s.id)}>
