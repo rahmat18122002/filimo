@@ -65,7 +65,7 @@ const Welcome = () => {
           {appName}
         </h1>
         <p className="mt-3 max-w-xs text-muted-foreground">
-          Лучшие фильмы и сериалы — всё в одном приложении
+          {t("app.subtitle")}
         </p>
 
         <motion.div
