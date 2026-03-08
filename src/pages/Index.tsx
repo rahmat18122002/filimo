@@ -279,6 +279,9 @@ const Index = () => {
 
       <HeroSlider />
 
+      {/* Stories */}
+      <Stories />
+
       {/* Catalog Section */}
       <main id="catalog" className="container mx-auto px-6 py-12">
         <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
