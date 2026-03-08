@@ -288,9 +288,9 @@ const Index = () => {
             {moviesByCategory.map(({ category, movies: catMovies }) => (
               <section key={category.id}>
                 <h2 className="mb-4 text-xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>
-                  {category.name}
+                  {getLocalizedField(category, "name", lang)}
                 </h2>
-                <MovieCarousel movies={catMovies} carouselSpeed={carouselSpeed} />
+                <MovieCarousel movies={catMovies} carouselSpeed={carouselSpeed} lang={lang} />
               </section>
             ))}
 
