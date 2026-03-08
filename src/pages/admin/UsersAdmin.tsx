@@ -40,6 +40,12 @@ const UsersAdmin = () => {
     loadUsers();
   };
 
+  const deleteUser = async (id: string) => {
+    await supabase.from("app_users").delete().eq("id", id);
+    toast({ title: "Пользователь удалён", variant: "destructive" });
+    loadUsers();
+  };
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>

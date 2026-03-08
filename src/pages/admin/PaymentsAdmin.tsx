@@ -73,6 +73,12 @@ const PaymentsAdmin = () => {
     load();
   };
 
+  const deletePayment = async (id: string) => {
+    await supabase.from("vip_payments").delete().eq("id", id);
+    toast({ title: "Платёж удалён", variant: "destructive" });
+    load();
+  };
+
   const statusBadge = (status: string) => {
     switch (status) {
       case "pending": return <Badge variant="outline" className="gap-1 text-amber-400 border-amber-400/30"><Clock className="h-3 w-3" /> Ожидает</Badge>;

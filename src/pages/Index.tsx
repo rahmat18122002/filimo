@@ -223,7 +223,7 @@ const Index = () => {
               >
                 <Crown className="h-4 w-4 text-accent" />
                 <span className="text-xs font-bold text-accent">
-                  VIP — {Math.max(0, Math.ceil((new Date(user.vip_until).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} дн.
+                  VIP — {Math.max(0, Math.ceil((new Date(user.vip_until).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))}
                 </span>
               </div>
             )}
