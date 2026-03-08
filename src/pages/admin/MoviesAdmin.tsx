@@ -64,12 +64,14 @@ const MoviesAdmin = () => {
     setIsOpen(true);
   };
 
-  const openEdit = (m: Movie) => {
+  const openEdit = (m: any) => {
     setEditMovie(m);
     setForm({
-      title: m.title, year: String(m.year), rating: String(m.rating),
-      genre: m.genre.join(", "), description: m.description, poster: m.poster,
-      duration: m.duration, trailer_url: m.trailer_url || "", is_featured: m.is_featured,
+      title: m.title, title_en: m.title_en || "", title_tg: m.title_tg || "", title_fa: m.title_fa || "",
+      year: String(m.year), rating: String(m.rating),
+      genre: m.genre.join(", "), description: m.description,
+      description_en: m.description_en || "", description_tg: m.description_tg || "", description_fa: m.description_fa || "",
+      poster: m.poster, duration: m.duration, trailer_url: m.trailer_url || "", is_featured: m.is_featured,
     });
     setIsOpen(true);
   };
