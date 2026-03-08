@@ -207,9 +207,14 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Stories at the very top */}
+      <div className="relative z-30 bg-background/95 backdrop-blur-sm">
+        <Stories />
+      </div>
+
       {/* Header */}
-      <header className="absolute top-0 z-20 w-full">
-        <div className="container mx-auto flex items-center justify-between px-6 py-5">
+      <header className="relative z-20 w-full">
+        <div className="container mx-auto flex items-center justify-between px-6 py-3">
           <div className="flex items-center gap-2.5">
             <Film className="h-7 w-7 text-primary" />
             <span className="text-xl font-bold text-foreground tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -228,9 +233,6 @@ const Index = () => {
       </header>
 
       <HeroSlider />
-
-      {/* Stories */}
-      <Stories />
 
       {/* Catalog Section */}
       <main id="catalog" className="container mx-auto px-6 py-12">
