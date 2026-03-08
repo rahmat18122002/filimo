@@ -282,8 +282,20 @@ const MoviesAdmin = () => {
               <Input value={form.trailer_url} onChange={(e) => setForm({ ...form, trailer_url: e.target.value })} className="bg-secondary border-border" />
             </div>
             <div className="grid gap-2">
-              <Label>Описание</Label>
+              <Label>Описание (RU)</Label>
               <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="bg-secondary border-border" rows={3} />
+            </div>
+            <div className="grid gap-2">
+              <Label>Description (EN)</Label>
+              <Textarea value={form.description_en} onChange={(e) => setForm({ ...form, description_en: e.target.value })} className="bg-secondary border-border" rows={2} />
+            </div>
+            <div className="grid gap-2">
+              <Label>Тавсиф (TG)</Label>
+              <Textarea value={form.description_tg} onChange={(e) => setForm({ ...form, description_tg: e.target.value })} className="bg-secondary border-border" rows={2} />
+            </div>
+            <div className="grid gap-2">
+              <Label>توضیحات (FA)</Label>
+              <Textarea value={form.description_fa} onChange={(e) => setForm({ ...form, description_fa: e.target.value })} className="bg-secondary border-border" rows={2} />
             </div>
             <div className="flex items-center gap-3">
               <Switch checked={form.is_featured} onCheckedChange={(v) => setForm({ ...form, is_featured: v })} />
