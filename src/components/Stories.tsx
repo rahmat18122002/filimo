@@ -14,6 +14,7 @@ interface Story {
   button_url: string | null;
   button_label: string | null;
   is_active: boolean;
+  created_at: string;
 }
 
 const Stories = () => {
@@ -32,7 +33,14 @@ const Stories = () => {
       .eq("is_active", true)
       .order("sort_order")
       .then(({ data }) => {
-        if (data) setStories(data as Story[]);
+        if (data) {
+          const now = Date.now();
+          const filtered = (data as Story[]).filter((s) => {
+            const created = new Date(s.created_at).getTime();
+            return now - created < 24 * 60 * 60 * 1000;
+          });
+          setStories(filtered);
+        }
       });
   };
 

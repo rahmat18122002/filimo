@@ -5,12 +5,14 @@ import { Film, UserPlus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { autoRegister, getCurrentUser } from "@/lib/userStore";
 import { supabase } from "@/integrations/supabase/client";
+import { useI18n } from "@/lib/i18n";
 
 const Welcome = () => {
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
   const [appName, setAppName] = useState("Filimo");
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   useEffect(() => {
     getCurrentUser().then((user) => {
@@ -63,7 +65,7 @@ const Welcome = () => {
           {appName}
         </h1>
         <p className="mt-3 max-w-xs text-muted-foreground">
-          Лучшие фильмы и сериалы — всё в одном приложении
+          {t("app.subtitle")}
         </p>
 
         <motion.div
@@ -83,12 +85,12 @@ const Welcome = () => {
             ) : (
               <UserPlus className="h-5 w-5" />
             )}
-            Войти в приложение
+            {t("app.enter")}
           </Button>
         </motion.div>
 
         <p className="mt-4 text-xs text-muted-foreground/60">
-          Регистрация автоматическая — просто нажмите кнопку
+          {t("app.auto_register")}
         </p>
       </motion.div>
     </div>
