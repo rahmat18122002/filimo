@@ -289,14 +289,50 @@ const MoviesAdmin = () => {
           </DialogHeader>
           <div className="space-y-4 max-h-[60vh] overflow-y-auto">
             {episodes.map((ep) => (
-              <div key={ep.id} className="flex items-center justify-between rounded-lg bg-secondary/50 px-4 py-3">
-                <div>
-                  <p className="text-sm font-medium text-foreground">Часть {ep.part_number}: {ep.title}</p>
-                  <p className="text-xs text-muted-foreground">{ep.is_free ? "Бесплатно" : "VIP"} • {ep.duration || "—"}</p>
+              <div key={ep.id} className="rounded-lg bg-secondary/50 px-4 py-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Часть {ep.part_number}: {ep.title}</p>
+                    <p className="text-xs text-muted-foreground">{ep.is_free ? "Бесплатно" : "VIP"} • {ep.duration || "—"}</p>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="icon" onClick={() => deleteEpisode(ep.id)}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => deleteEpisode(ep.id)}>
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
+                {/* Edit episode link inline */}
+                <div className="flex gap-2">
+                  <Input
+                    defaultValue={ep.video_url || ""}
+                    placeholder="Ссылка (Telegram/URL)"
+                    className="bg-background border-border text-xs h-8 flex-1"
+                    onBlur={async (e) => {
+                      const newUrl = e.target.value;
+                      if (newUrl !== (ep.video_url || "")) {
+                        await supabase.from("episodes").update({ video_url: newUrl || null }).eq("id", ep.id);
+                        toast({ title: `Часть ${ep.part_number} опубликована ✅` });
+                        if (epMovie) {
+                          const { data } = await supabase.from("episodes").select("*").eq("movie_id", epMovie.id).order("part_number");
+                          setEpisodes((data || []) as Episode[]);
+                        }
+                      }
+                    }}
+                  />
+                  <div className="flex items-center gap-1.5">
+                    <Switch
+                      checked={ep.is_free}
+                      onCheckedChange={async (v) => {
+                        await supabase.from("episodes").update({ is_free: v }).eq("id", ep.id);
+                        if (epMovie) {
+                          const { data } = await supabase.from("episodes").select("*").eq("movie_id", epMovie.id).order("part_number");
+                          setEpisodes((data || []) as Episode[]);
+                        }
+                      }}
+                    />
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">{ep.is_free ? "Free" : "VIP"}</span>
+                  </div>
+                </div>
               </div>
             ))}
             <div className="space-y-3 border-t border-border pt-4">
