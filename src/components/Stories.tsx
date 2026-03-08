@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
@@ -17,6 +17,7 @@ const Stories = () => {
   const [stories, setStories] = useState<Story[]>([]);
   const [viewingIndex, setViewingIndex] = useState<number | null>(null);
   const [progress, setProgress] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const navigate = useNavigate();
 
   const fetchStories = () => {
@@ -36,9 +37,12 @@ const Stories = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Auto-progress when viewing
+  const currentStory = viewingIndex !== null ? stories[viewingIndex] : null;
+  const isVideo = currentStory?.video_url;
+
+  // Auto-progress when viewing (only for images)
   useEffect(() => {
-    if (viewingIndex === null) return;
+    if (viewingIndex === null || isVideo) return;
     setProgress(0);
     const duration = 5000;
     const interval = 50;
@@ -47,7 +51,6 @@ const Stories = () => {
       elapsed += interval;
       setProgress((elapsed / duration) * 100);
       if (elapsed >= duration) {
-        // Next story or close
         if (viewingIndex < stories.length - 1) {
           setViewingIndex(viewingIndex + 1);
         } else {
@@ -56,23 +59,38 @@ const Stories = () => {
       }
     }, interval);
     return () => clearInterval(timer);
-  }, [viewingIndex, stories.length]);
+  }, [viewingIndex, stories.length, isVideo]);
+
+  // Video progress tracking
+  const handleVideoTimeUpdate = () => {
+    if (!videoRef.current) return;
+    const { currentTime, duration } = videoRef.current;
+    if (duration) setProgress((currentTime / duration) * 100);
+  };
+
+  const handleVideoEnded = () => {
+    if (viewingIndex !== null && viewingIndex < stories.length - 1) {
+      setViewingIndex(viewingIndex + 1);
+    } else {
+      setViewingIndex(null);
+    }
+  };
 
   if (stories.length === 0) return null;
 
   return (
     <>
-      {/* Story circles */}
-      <div className="flex gap-3 overflow-x-auto scrollbar-hide px-6 py-4">
+      {/* Story circles - compact for inline header */}
+      <div className="flex gap-2 overflow-x-auto scrollbar-hide py-1">
         {stories.map((story, i) => (
           <motion.button
             key={story.id}
             whileTap={{ scale: 0.9 }}
             onClick={() => setViewingIndex(i)}
-            className="flex flex-col items-center gap-1.5 shrink-0"
+            className="flex flex-col items-center gap-0.5 shrink-0"
           >
-            <div className="relative h-16 w-16 rounded-full p-[2px] bg-gradient-to-br from-primary via-accent to-destructive">
-              <div className="h-full w-full rounded-full overflow-hidden border-2 border-background">
+            <div className="relative h-11 w-11 rounded-full p-[2px] bg-gradient-to-br from-primary via-accent to-destructive">
+              <div className="h-full w-full rounded-full overflow-hidden border-[1.5px] border-background">
                 <img
                   src={story.image_url}
                   alt={story.title}
@@ -80,7 +98,7 @@ const Stories = () => {
                 />
               </div>
             </div>
-            <span className="text-[10px] text-muted-foreground font-medium line-clamp-1 max-w-[64px] text-center">
+            <span className="text-[9px] text-muted-foreground font-medium line-clamp-1 max-w-[44px] text-center">
               {story.title}
             </span>
           </motion.button>
@@ -123,15 +141,28 @@ const Stories = () => {
               <X className="h-6 w-6" />
             </button>
 
-            {/* Content */}
-            <motion.img
-              key={viewingIndex}
-              initial={{ scale: 1.1, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              src={stories[viewingIndex].image_url}
-              alt=""
-              className="h-full w-full object-cover"
-            />
+            {/* Content - Video or Image */}
+            {stories[viewingIndex].video_url ? (
+              <video
+                ref={videoRef}
+                key={viewingIndex}
+                src={stories[viewingIndex].video_url!}
+                autoPlay
+                playsInline
+                onTimeUpdate={handleVideoTimeUpdate}
+                onEnded={handleVideoEnded}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <motion.img
+                key={viewingIndex}
+                initial={{ scale: 1.1, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                src={stories[viewingIndex].image_url}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            )}
 
             {/* Navigate left/right */}
             <button

@@ -207,27 +207,21 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Stories at the very top */}
-      <div className="relative z-30 bg-background/95 backdrop-blur-sm">
-        <Stories />
-      </div>
-
-      {/* Header */}
-      <header className="relative z-20 w-full">
-        <div className="container mx-auto flex items-center justify-between px-6 py-3">
-          <div className="flex items-center gap-2.5">
-            <Film className="h-7 w-7 text-primary" />
-            <span className="text-xl font-bold text-foreground tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+      {/* Header with Stories inline */}
+      <header className="relative z-20 w-full bg-background">
+        <div className="container mx-auto flex items-center gap-3 px-4 py-3">
+          <div className="flex items-center gap-2 shrink-0">
+            <Film className="h-6 w-6 text-primary" />
+            <span className="text-lg font-bold text-foreground tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
               {appName}
             </span>
           </div>
-          <div className="flex items-center gap-4">
+          {/* Stories circles inline */}
+          <div className="flex-1 min-w-0">
+            <Stories />
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
             {user && <NotificationBell userId={user.id} />}
-            <nav className="hidden items-center gap-8 text-sm font-medium text-muted-foreground md:flex">
-              <a href="#catalog" className="transition-colors hover:text-foreground">Каталог</a>
-              <a href="#" className="transition-colors hover:text-foreground">Новинки</a>
-              <a href="#" className="transition-colors hover:text-foreground">Топ 100</a>
-            </nav>
           </div>
         </div>
       </header>

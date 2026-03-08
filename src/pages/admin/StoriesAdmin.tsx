@@ -24,6 +24,7 @@ const StoriesAdmin = () => {
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({ title: "", image_url: "", movie_id: "" });
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const { toast } = useToast();
 
   useEffect(() => { fetchStories(); }, []);
