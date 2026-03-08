@@ -225,8 +225,20 @@ const MoviesAdmin = () => {
           </DialogHeader>
           <div className="grid gap-4 py-2 max-h-[70vh] overflow-y-auto">
             <div className="grid gap-2">
-              <Label>Название</Label>
+              <Label>Название (RU)</Label>
               <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="bg-secondary border-border" />
+            </div>
+            <div className="grid gap-2">
+              <Label>Title (EN)</Label>
+              <Input value={form.title_en} onChange={(e) => setForm({ ...form, title_en: e.target.value })} className="bg-secondary border-border" />
+            </div>
+            <div className="grid gap-2">
+              <Label>Номи (TG)</Label>
+              <Input value={form.title_tg} onChange={(e) => setForm({ ...form, title_tg: e.target.value })} className="bg-secondary border-border" />
+            </div>
+            <div className="grid gap-2">
+              <Label>عنوان (FA)</Label>
+              <Input value={form.title_fa} onChange={(e) => setForm({ ...form, title_fa: e.target.value })} className="bg-secondary border-border" />
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div className="grid gap-2">
