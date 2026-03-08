@@ -165,8 +165,20 @@ const CategoriesAdmin = () => {
           </DialogHeader>
           <div className="grid gap-4 py-2">
             <div className="grid gap-2">
-              <Label>Название</Label>
+              <Label>Название (RU)</Label>
               <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="bg-secondary border-border" />
+            </div>
+            <div className="grid gap-2">
+              <Label>Name (EN)</Label>
+              <Input value={form.name_en} onChange={(e) => setForm({ ...form, name_en: e.target.value })} className="bg-secondary border-border" />
+            </div>
+            <div className="grid gap-2">
+              <Label>Ном (TG)</Label>
+              <Input value={form.name_tg} onChange={(e) => setForm({ ...form, name_tg: e.target.value })} className="bg-secondary border-border" />
+            </div>
+            <div className="grid gap-2">
+              <Label>نام (FA)</Label>
+              <Input value={form.name_fa} onChange={(e) => setForm({ ...form, name_fa: e.target.value })} className="bg-secondary border-border" />
             </div>
             <div className="grid gap-2">
               <Label>Порядок сортировки</Label>
