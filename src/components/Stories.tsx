@@ -141,7 +141,7 @@ const Stories = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black flex items-center justify-center"
+            className="fixed inset-0 z-[60] bg-black flex items-center justify-center"
           >
             {/* Progress bars */}
             <div className="absolute top-3 left-3 right-3 flex gap-1 z-10">
