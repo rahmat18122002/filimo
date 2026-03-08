@@ -386,6 +386,50 @@ export type Database = {
           },
         ]
       }
+      stories: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          image_url: string
+          is_active: boolean
+          movie_id: string | null
+          sort_order: number
+          title: string
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          movie_id?: string | null
+          sort_order?: number
+          title: string
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          movie_id?: string | null
+          sort_order?: number
+          title?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stories_movie_id_fkey"
+            columns: ["movie_id"]
+            isOneToOne: false
+            referencedRelation: "movies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vip_cards: {
         Row: {
           card_label: string | null
