@@ -199,6 +199,18 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+// Helper to get a localized field from a DB row
+// e.g. getLocalizedField(movie, "title", lang) checks title_en, title_tg, title_fa
+export const getLocalizedField = (
+  row: Record<string, any>,
+  field: string,
+  lang: Lang
+): string => {
+  if (lang === "ru") return row[field] || "";
+  const localized = row[`${field}_${lang}`];
+  return localized && localized.trim() ? localized : row[field] || "";
+};
+
 export const LANGUAGES: { code: Lang; label: string; flag: string }[] = [
   { code: "en", label: "English", flag: "🇬🇧" },
   { code: "ru", label: "Русский", flag: "🇷🇺" },
