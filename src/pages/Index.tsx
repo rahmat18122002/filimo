@@ -29,7 +29,7 @@ interface DBCategory {
   sort_order: number;
 }
 
-const MovieCarousel = ({ movies, carouselSpeed, lang }: { movies: DBMovie[]; carouselSpeed: number; lang: string }) => {
+const MovieCarousel = ({ movies, carouselSpeed, lang }: { movies: DBMovie[]; carouselSpeed: number; lang: Lang }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const intervalRef = useRef<NodeJS.Timeout>();
