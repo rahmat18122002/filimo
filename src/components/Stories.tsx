@@ -135,109 +135,110 @@ const Stories = () => {
         ))}
       </div>
 
-      {/* Fullscreen story viewer */}
-      <AnimatePresence>
-        {viewingIndex !== null && stories[viewingIndex] && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black flex items-center justify-center"
-          >
-            {/* Progress bars */}
-            <div className="absolute top-3 left-3 right-3 flex gap-1 z-10">
-              {stories.map((_, i) => (
-                <div key={i} className="flex-1 h-0.5 rounded-full bg-white/30 overflow-hidden">
-                  <div
-                    className="h-full bg-white rounded-full transition-all"
-                    style={{
-                      width: i < viewingIndex! ? "100%" : i === viewingIndex ? `${progress}%` : "0%",
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-
-            {/* Title + controls row */}
-            <div className="absolute top-6 left-3 right-3 z-10 flex items-center justify-between">
-              <p className="text-white text-sm font-semibold truncate flex-1">{stories[viewingIndex].title}</p>
-              <div className="flex items-center gap-2">
-                {/* Play/Pause */}
-                <button
-                  onClick={togglePause}
-                  className="text-white/70 hover:text-white p-1 transition-colors"
-                >
-                  {paused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
-                </button>
-                {/* Close */}
-                <button
-                  onClick={() => setViewingIndex(null)}
-                  className="text-white/70 hover:text-white p-1 transition-colors"
-                >
-                  <X className="h-5 w-5" />
-                </button>
+      {/* Fullscreen story viewer - rendered via portal to escape stacking context */}
+      {createPortal(
+        <AnimatePresence>
+          {viewingIndex !== null && stories[viewingIndex] && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[100] bg-black flex items-center justify-center"
+            >
+              {/* Progress bars */}
+              <div className="absolute top-3 left-3 right-3 flex gap-1 z-10">
+                {stories.map((_, i) => (
+                  <div key={i} className="flex-1 h-0.5 rounded-full bg-white/30 overflow-hidden">
+                    <div
+                      className="h-full bg-white rounded-full transition-all"
+                      style={{
+                        width: i < viewingIndex! ? "100%" : i === viewingIndex ? `${progress}%` : "0%",
+                      }}
+                    />
+                  </div>
+                ))}
               </div>
-            </div>
 
-            {/* Content */}
-            {stories[viewingIndex].video_url ? (
-              <video
-                ref={videoRef}
-                key={viewingIndex}
-                src={stories[viewingIndex].video_url!}
-                autoPlay
-                playsInline
-                onTimeUpdate={handleVideoTimeUpdate}
-                onEnded={handleVideoEnded}
-                className="h-full w-full object-cover"
+              {/* Title + controls row */}
+              <div className="absolute top-6 left-3 right-3 z-10 flex items-center justify-between">
+                <p className="text-white text-sm font-semibold truncate flex-1">{stories[viewingIndex].title}</p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={togglePause}
+                    className="text-white/70 hover:text-white p-1 transition-colors"
+                  >
+                    {paused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
+                  </button>
+                  <button
+                    onClick={() => setViewingIndex(null)}
+                    className="text-white/70 hover:text-white p-1 transition-colors"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Content */}
+              {stories[viewingIndex].video_url ? (
+                <video
+                  ref={videoRef}
+                  key={viewingIndex}
+                  src={stories[viewingIndex].video_url!}
+                  autoPlay
+                  playsInline
+                  onTimeUpdate={handleVideoTimeUpdate}
+                  onEnded={handleVideoEnded}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <motion.img
+                  key={viewingIndex}
+                  initial={{ scale: 1.1, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  src={stories[viewingIndex].image_url}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              )}
+
+              {/* Navigate left/right */}
+              <button
+                onClick={() => setViewingIndex(Math.max(0, viewingIndex - 1))}
+                className="absolute left-0 top-0 bottom-0 w-1/3 z-10"
               />
-            ) : (
-              <motion.img
-                key={viewingIndex}
-                initial={{ scale: 1.1, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                src={stories[viewingIndex].image_url}
-                alt=""
-                className="h-full w-full object-cover"
-              />
-            )}
-
-            {/* Navigate left/right */}
-            <button
-              onClick={() => setViewingIndex(Math.max(0, viewingIndex - 1))}
-              className="absolute left-0 top-0 bottom-0 w-1/3 z-10"
-            />
-            <button
-              onClick={() => {
-                if (viewingIndex < stories.length - 1) {
-                  setViewingIndex(viewingIndex + 1);
-                } else {
-                  setViewingIndex(null);
-                }
-              }}
-              className="absolute right-0 top-0 bottom-0 w-1/3 z-10"
-            />
-
-            {/* Bottom button - URL or movie link */}
-            {(stories[viewingIndex].button_url || stories[viewingIndex].movie_id) && (
               <button
                 onClick={() => {
-                  const story = stories[viewingIndex!];
-                  if (story.button_url) {
-                    window.open(story.button_url, "_blank");
-                  } else if (story.movie_id) {
+                  if (viewingIndex < stories.length - 1) {
+                    setViewingIndex(viewingIndex + 1);
+                  } else {
                     setViewingIndex(null);
-                    navigate(`/movie/${story.movie_id}`);
                   }
                 }}
-                className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 rounded-full bg-white/20 backdrop-blur-md border border-white/30 px-6 py-2.5 text-sm font-semibold text-white hover:bg-white/30 transition-colors"
-              >
-                {stories[viewingIndex].button_label || "Подробнее"} →
-              </button>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+                className="absolute right-0 top-0 bottom-0 w-1/3 z-10"
+              />
+
+              {/* Bottom button - URL or movie link */}
+              {(stories[viewingIndex].button_url || stories[viewingIndex].movie_id) && (
+                <button
+                  onClick={() => {
+                    const story = stories[viewingIndex!];
+                    if (story.button_url) {
+                      window.open(story.button_url, "_blank");
+                    } else if (story.movie_id) {
+                      setViewingIndex(null);
+                      navigate(`/movie/${story.movie_id}`);
+                    }
+                  }}
+                  className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 rounded-full bg-white/20 backdrop-blur-md border border-white/30 px-6 py-2.5 text-sm font-semibold text-white hover:bg-white/30 transition-colors"
+                >
+                  {stories[viewingIndex].button_label || "Подробнее"} →
+                </button>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   );
 };
