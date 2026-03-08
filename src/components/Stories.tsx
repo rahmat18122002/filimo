@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { X, Play, Pause } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
@@ -10,6 +10,8 @@ interface Story {
   image_url: string;
   video_url: string | null;
   movie_id: string | null;
+  button_url: string | null;
+  button_label: string | null;
   is_active: boolean;
 }
 
@@ -17,7 +19,9 @@ const Stories = () => {
   const [stories, setStories] = useState<Story[]>([]);
   const [viewingIndex, setViewingIndex] = useState<number | null>(null);
   const [progress, setProgress] = useState(0);
+  const [paused, setPaused] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const pausedRef = useRef(false);
   const navigate = useNavigate();
 
   const fetchStories = () => {
@@ -37,10 +41,20 @@ const Stories = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Keep ref in sync
+  useEffect(() => {
+    pausedRef.current = paused;
+  }, [paused]);
+
+  // Reset pause on story change
+  useEffect(() => {
+    setPaused(false);
+  }, [viewingIndex]);
+
   const currentStory = viewingIndex !== null ? stories[viewingIndex] : null;
   const isVideo = currentStory?.video_url;
 
-  // Auto-progress when viewing (only for images)
+  // Auto-progress for images
   useEffect(() => {
     if (viewingIndex === null || isVideo) return;
     setProgress(0);
@@ -48,6 +62,7 @@ const Stories = () => {
     const interval = 50;
     let elapsed = 0;
     const timer = setInterval(() => {
+      if (pausedRef.current) return;
       elapsed += interval;
       setProgress((elapsed / duration) * 100);
       if (elapsed >= duration) {
@@ -61,7 +76,16 @@ const Stories = () => {
     return () => clearInterval(timer);
   }, [viewingIndex, stories.length, isVideo]);
 
-  // Video progress tracking
+  // Pause/play video
+  useEffect(() => {
+    if (!videoRef.current) return;
+    if (paused) {
+      videoRef.current.pause();
+    } else {
+      videoRef.current.play();
+    }
+  }, [paused]);
+
   const handleVideoTimeUpdate = () => {
     if (!videoRef.current) return;
     const { currentTime, duration } = videoRef.current;
@@ -76,11 +100,16 @@ const Stories = () => {
     }
   };
 
+  const togglePause = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setPaused((p) => !p);
+  };
+
   if (stories.length === 0) return null;
 
   return (
     <>
-      {/* Story circles - compact for inline header */}
+      {/* Story circles */}
       <div className="flex gap-2 overflow-x-auto scrollbar-hide py-1">
         {stories.map((story, i) => (
           <motion.button
@@ -128,20 +157,28 @@ const Stories = () => {
               ))}
             </div>
 
-            {/* Title */}
-            <div className="absolute top-6 left-3 right-12 z-10">
-              <p className="text-white text-sm font-semibold">{stories[viewingIndex].title}</p>
+            {/* Title + controls row */}
+            <div className="absolute top-6 left-3 right-3 z-10 flex items-center justify-between">
+              <p className="text-white text-sm font-semibold truncate flex-1">{stories[viewingIndex].title}</p>
+              <div className="flex items-center gap-2">
+                {/* Play/Pause */}
+                <button
+                  onClick={togglePause}
+                  className="text-white/70 hover:text-white p-1 transition-colors"
+                >
+                  {paused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
+                </button>
+                {/* Close */}
+                <button
+                  onClick={() => setViewingIndex(null)}
+                  className="text-white/70 hover:text-white p-1 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
             </div>
 
-            {/* Close */}
-            <button
-              onClick={() => setViewingIndex(null)}
-              className="absolute top-5 right-3 z-10 text-white p-1"
-            >
-              <X className="h-6 w-6" />
-            </button>
-
-            {/* Content - Video or Image */}
+            {/* Content */}
             {stories[viewingIndex].video_url ? (
               <video
                 ref={videoRef}
@@ -180,16 +217,21 @@ const Stories = () => {
               className="absolute right-0 top-0 bottom-0 w-1/3 z-10"
             />
 
-            {/* Go to movie */}
-            {stories[viewingIndex].movie_id && (
+            {/* Bottom button - URL or movie link */}
+            {(stories[viewingIndex].button_url || stories[viewingIndex].movie_id) && (
               <button
                 onClick={() => {
-                  setViewingIndex(null);
-                  navigate(`/movie/${stories[viewingIndex!].movie_id}`);
+                  const story = stories[viewingIndex!];
+                  if (story.button_url) {
+                    window.open(story.button_url, "_blank");
+                  } else if (story.movie_id) {
+                    setViewingIndex(null);
+                    navigate(`/movie/${story.movie_id}`);
+                  }
                 }}
-                className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 rounded-full bg-white px-6 py-2.5 text-sm font-bold text-black"
+                className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 rounded-full bg-white/20 backdrop-blur-md border border-white/30 px-6 py-2.5 text-sm font-semibold text-white hover:bg-white/30 transition-colors"
               >
-                Смотреть →
+                {stories[viewingIndex].button_label || "Подробнее"} →
               </button>
             )}
           </motion.div>

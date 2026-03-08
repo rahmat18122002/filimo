@@ -22,7 +22,7 @@ const StoriesAdmin = () => {
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [form, setForm] = useState({ title: "", image_url: "", movie_id: "" });
+  const [form, setForm] = useState({ title: "", image_url: "", movie_id: "", button_url: "", button_label: "" });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const { toast } = useToast();
