@@ -36,29 +36,38 @@ const StoriesAdmin = () => {
   };
 
   const addStory = async () => {
-    if (!form.title) return;
+    if (!form.title) {
+      toast({ title: "Введите название", variant: "destructive" });
+      return;
+    }
+    if (!imageFile && !form.image_url) {
+      toast({ title: "Загрузите изображение или укажите URL", variant: "destructive" });
+      return;
+    }
     setUploading(true);
     try {
       let imageUrl = form.image_url;
       if (imageFile) {
         const ext = imageFile.name.split(".").pop();
-        const path = `stories/${crypto.randomUUID()}.${ext}`;
-        const { error } = await supabase.storage.from("posters").upload(path, imageFile);
-        if (error) throw error;
-        const { data } = supabase.storage.from("posters").getPublicUrl(path);
-        imageUrl = data.publicUrl;
+        const path = `${crypto.randomUUID()}.${ext}`;
+        const { error: uploadError } = await supabase.storage.from("stories").upload(path, imageFile);
+        if (uploadError) throw uploadError;
+        const { data: urlData } = supabase.storage.from("stories").getPublicUrl(path);
+        imageUrl = urlData.publicUrl;
       }
-      await supabase.from("stories").insert({
+      const { error: insertError } = await supabase.from("stories").insert({
         title: form.title,
         image_url: imageUrl,
         movie_id: form.movie_id || null,
         sort_order: stories.length,
       });
+      if (insertError) throw insertError;
       setForm({ title: "", image_url: "", movie_id: "" });
       setImageFile(null);
       fetchStories();
       toast({ title: "Стори добавлена ✅" });
     } catch (e: any) {
+      console.error("Story add error:", e);
       toast({ title: "Ошибка", description: e.message, variant: "destructive" });
     }
     setUploading(false);
