@@ -122,7 +122,7 @@ const MovieDetail = () => {
                 <span key={g} className="rounded-md bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">{g}</span>
               ))}
             </div>
-            <p className="mt-4 text-muted-foreground leading-relaxed">{movie.description}</p>
+            <p className="mt-4 text-muted-foreground leading-relaxed">{getLocalizedField(movie, "description", lang)}</p>
           </motion.div>
         </div>
 
