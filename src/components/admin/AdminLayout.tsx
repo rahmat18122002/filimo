@@ -28,8 +28,8 @@ const navItems = [
   { to: "/admin/payments", icon: ImageIcon, label: "Скриншоты оплат" },
   { to: "/admin/slider", icon: ImageIcon, label: "Слайдер" },
   { to: "/admin/live-channels", icon: Satellite, label: "🛰️ Live TV" },
+  { to: "/admin/stories", icon: BookOpen, label: "📖 Stories" },
   { to: "/admin/settings", icon: Settings, label: "Настройки" },
-];
 
 const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false);

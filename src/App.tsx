@@ -49,6 +49,7 @@ const App = () => (
             <Route path="payments" element={<PaymentsAdmin />} />
             <Route path="slider" element={<SliderAdmin />} />
             <Route path="live-channels" element={<LiveChannelsAdmin />} />
+            <Route path="stories" element={<StoriesAdmin />} />
             <Route path="settings" element={<SettingsAdmin />} />
             
           </Route>
