@@ -134,6 +134,14 @@ const StoriesAdmin = () => {
               <Label>Или URL изображения</Label>
               <Input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://..." />
             </div>
+            <div>
+              <Label>🔗 URL кнопки (опционально)</Label>
+              <Input value={form.button_url} onChange={(e) => setForm({ ...form, button_url: e.target.value })} placeholder="https://example.com" />
+            </div>
+            <div>
+              <Label>📝 Текст кнопки</Label>
+              <Input value={form.button_label} onChange={(e) => setForm({ ...form, button_label: e.target.value })} placeholder="Подробнее" />
+            </div>
           </div>
           <Button onClick={addStory} disabled={uploading} className="gap-2">
             {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
