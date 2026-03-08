@@ -265,7 +265,7 @@ const Index = () => {
                     </div>
                   </div>
                   <div className="mt-3 px-1">
-                    <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-1">{movie.title}</h3>
+                    <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-1">{getLocalizedField(movie, "title", lang)}</h3>
                     <div className="mt-1.5 flex items-center gap-3 text-xs text-muted-foreground">
                       <span>{movie.year}</span>
                       <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{movie.duration}</span>
