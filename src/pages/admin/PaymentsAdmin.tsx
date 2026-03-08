@@ -122,16 +122,21 @@ const PaymentsAdmin = () => {
                 </div>
               </div>
 
-              {p.status === "pending" && (
-                <div className="flex gap-2">
-                  <Button size="sm" className="gap-1" onClick={() => handleAction(p, "approved")}>
-                    <CheckCircle className="h-4 w-4" /> Принять
-                  </Button>
-                  <Button size="sm" variant="destructive" className="gap-1" onClick={() => handleAction(p, "rejected")}>
-                    <XCircle className="h-4 w-4" /> Отклонить
-                  </Button>
-                </div>
-              )}
+              <div className="flex gap-2">
+                {p.status === "pending" && (
+                  <>
+                    <Button size="sm" className="gap-1" onClick={() => handleAction(p, "approved")}>
+                      <CheckCircle className="h-4 w-4" /> Принять
+                    </Button>
+                    <Button size="sm" variant="destructive" className="gap-1" onClick={() => handleAction(p, "rejected")}>
+                      <XCircle className="h-4 w-4" /> Отклонить
+                    </Button>
+                  </>
+                )}
+                <Button size="sm" variant="ghost" className="gap-1 text-destructive hover:text-destructive" onClick={() => deletePayment(p.id)}>
+                  <Trash2 className="h-4 w-4" /> Удалить
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ))}
