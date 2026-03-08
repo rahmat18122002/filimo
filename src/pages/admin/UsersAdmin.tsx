@@ -92,6 +92,10 @@ const UsersAdmin = () => {
                             <Crown className="h-4 w-4" />
                             {u.is_vip ? "Снять VIP" : "Назначить VIP"}
                           </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => deleteUser(u.id)} className="gap-2 text-destructive focus:text-destructive">
+                            <Ban className="h-4 w-4" />
+                            Удалить / Заблокировать
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </td>
