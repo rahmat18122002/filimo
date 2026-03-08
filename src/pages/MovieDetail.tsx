@@ -32,7 +32,6 @@ const MovieDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { t, lang } = useI18n();
-  const navigate = useNavigate();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [user, setUser] = useState<AppUser | null>(null);
