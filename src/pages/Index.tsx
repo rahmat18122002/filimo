@@ -9,6 +9,7 @@ import { useAutoRegister } from "@/hooks/useAutoRegister";
 import { NotificationBell } from "@/components/NotificationBell";
 import { motion } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
+import Stories from "@/components/Stories";
 
 interface DBMovie {
   id: string;
