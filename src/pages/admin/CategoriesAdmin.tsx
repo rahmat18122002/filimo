@@ -50,6 +50,9 @@ const CategoriesAdmin = () => {
   const handleSave = async () => {
     const payload = {
       name: form.name.trim(),
+      name_en: form.name_en.trim(),
+      name_tg: form.name_tg.trim(),
+      name_fa: form.name_fa.trim(),
       sort_order: Number(form.sort_order) || 0,
       is_active: form.is_active,
     };
