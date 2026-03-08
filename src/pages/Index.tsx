@@ -299,7 +299,7 @@ const Index = () => {
                 <h2 className="mb-4 text-xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>
                   {t("movies.all")}
                 </h2>
-                <MovieCarousel movies={movies} carouselSpeed={carouselSpeed} />
+                <MovieCarousel movies={movies} carouselSpeed={carouselSpeed} lang={lang} />
               </section>
             )}
 
