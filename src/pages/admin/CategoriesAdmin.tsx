@@ -20,7 +20,7 @@ const CategoriesAdmin = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [editCat, setEditCat] = useState<Category | null>(null);
-  const [form, setForm] = useState({ name: "", sort_order: "0", is_active: true });
+  const [form, setForm] = useState({ name: "", name_en: "", name_tg: "", name_fa: "", sort_order: "0", is_active: true });
 
   // Carousel speed
   const [carouselSpeed, setCarouselSpeed] = useState("5");
@@ -38,20 +38,21 @@ const CategoriesAdmin = () => {
   useEffect(() => { load(); }, []);
 
   const openNew = () => {
-    setEditCat(null);
-    setForm({ name: "", sort_order: String(categories.length), is_active: true });
-    setIsOpen(true);
+    setForm({ name: "", name_en: "", name_tg: "", name_fa: "", sort_order: String(categories.length), is_active: true });
   };
 
-  const openEdit = (c: Category) => {
+  const openEdit = (c: any) => {
     setEditCat(c);
-    setForm({ name: c.name, sort_order: String(c.sort_order), is_active: c.is_active });
+    setForm({ name: c.name, name_en: c.name_en || "", name_tg: c.name_tg || "", name_fa: c.name_fa || "", sort_order: String(c.sort_order), is_active: c.is_active });
     setIsOpen(true);
   };
 
   const handleSave = async () => {
     const payload = {
       name: form.name.trim(),
+      name_en: form.name_en.trim(),
+      name_tg: form.name_tg.trim(),
+      name_fa: form.name_fa.trim(),
       sort_order: Number(form.sort_order) || 0,
       is_active: form.is_active,
     };
@@ -164,8 +165,20 @@ const CategoriesAdmin = () => {
           </DialogHeader>
           <div className="grid gap-4 py-2">
             <div className="grid gap-2">
-              <Label>Название</Label>
+              <Label>Название (RU)</Label>
               <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="bg-secondary border-border" />
+            </div>
+            <div className="grid gap-2">
+              <Label>Name (EN)</Label>
+              <Input value={form.name_en} onChange={(e) => setForm({ ...form, name_en: e.target.value })} className="bg-secondary border-border" />
+            </div>
+            <div className="grid gap-2">
+              <Label>Ном (TG)</Label>
+              <Input value={form.name_tg} onChange={(e) => setForm({ ...form, name_tg: e.target.value })} className="bg-secondary border-border" />
+            </div>
+            <div className="grid gap-2">
+              <Label>نام (FA)</Label>
+              <Input value={form.name_fa} onChange={(e) => setForm({ ...form, name_fa: e.target.value })} className="bg-secondary border-border" />
             </div>
             <div className="grid gap-2">
               <Label>Порядок сортировки</Label>

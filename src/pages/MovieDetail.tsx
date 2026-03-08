@@ -5,6 +5,7 @@ import { ArrowLeft, Play, Lock, Crown, Star, Clock, Film } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { autoRegister, isVip, type AppUser } from "@/lib/userStore";
+import { useI18n, getLocalizedField } from "@/lib/i18n";
 
 interface Movie {
   id: string;
@@ -30,6 +31,7 @@ interface Episode {
 const MovieDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t, lang } = useI18n();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [user, setUser] = useState<AppUser | null>(null);
@@ -107,7 +109,7 @@ const MovieDetail = () => {
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex-1">
             <h1 className="text-3xl font-bold text-foreground md:text-4xl" style={{ fontFamily: "'Playfair Display', serif" }}>
-              {movie.title}
+              {getLocalizedField(movie, "title", lang)}
             </h1>
             <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
               <span>{movie.year}</span>
@@ -119,7 +121,7 @@ const MovieDetail = () => {
                 <span key={g} className="rounded-md bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">{g}</span>
               ))}
             </div>
-            <p className="mt-4 text-muted-foreground leading-relaxed">{movie.description}</p>
+            <p className="mt-4 text-muted-foreground leading-relaxed">{getLocalizedField(movie, "description", lang)}</p>
           </motion.div>
         </div>
 

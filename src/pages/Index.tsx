@@ -10,7 +10,7 @@ import { NotificationBell } from "@/components/NotificationBell";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
 import Stories from "@/components/Stories";
-import { useI18n, LANGUAGES } from "@/lib/i18n";
+import { useI18n, LANGUAGES, getLocalizedField, type Lang } from "@/lib/i18n";
 
 interface DBMovie {
   id: string;
@@ -29,7 +29,7 @@ interface DBCategory {
   sort_order: number;
 }
 
-const MovieCarousel = ({ movies, carouselSpeed }: { movies: DBMovie[]; carouselSpeed: number }) => {
+const MovieCarousel = ({ movies, carouselSpeed, lang }: { movies: DBMovie[]; carouselSpeed: number; lang: Lang }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const intervalRef = useRef<NodeJS.Timeout>();
@@ -115,7 +115,7 @@ const MovieCarousel = ({ movies, carouselSpeed }: { movies: DBMovie[]; carouselS
             <div className="mt-3 px-1">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-1 group-hover:text-primary transition-colors flex-1">
-                  {movie.title}
+                  {getLocalizedField(movie, "title", lang)}
                 </h3>
                 <button
                   onClick={async (e) => {
@@ -265,7 +265,7 @@ const Index = () => {
                     </div>
                   </div>
                   <div className="mt-3 px-1">
-                    <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-1">{movie.title}</h3>
+                    <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-1">{getLocalizedField(movie, "title", lang)}</h3>
                     <div className="mt-1.5 flex items-center gap-3 text-xs text-muted-foreground">
                       <span>{movie.year}</span>
                       <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{movie.duration}</span>
@@ -288,9 +288,9 @@ const Index = () => {
             {moviesByCategory.map(({ category, movies: catMovies }) => (
               <section key={category.id}>
                 <h2 className="mb-4 text-xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>
-                  {category.name}
+                  {getLocalizedField(category, "name", lang)}
                 </h2>
-                <MovieCarousel movies={catMovies} carouselSpeed={carouselSpeed} />
+                <MovieCarousel movies={catMovies} carouselSpeed={carouselSpeed} lang={lang} />
               </section>
             ))}
 
@@ -299,7 +299,7 @@ const Index = () => {
                 <h2 className="mb-4 text-xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>
                   {t("movies.all")}
                 </h2>
-                <MovieCarousel movies={movies} carouselSpeed={carouselSpeed} />
+                <MovieCarousel movies={movies} carouselSpeed={carouselSpeed} lang={lang} />
               </section>
             )}
 
