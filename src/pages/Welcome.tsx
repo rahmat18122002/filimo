@@ -12,6 +12,7 @@ const Welcome = () => {
   const [checking, setChecking] = useState(true);
   const [appName, setAppName] = useState("Filimo");
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   useEffect(() => {
     getCurrentUser().then((user) => {
