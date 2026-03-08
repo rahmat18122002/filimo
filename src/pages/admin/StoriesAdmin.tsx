@@ -24,6 +24,7 @@ const StoriesAdmin = () => {
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({ title: "", image_url: "", movie_id: "" });
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const { toast } = useToast();
 
   useEffect(() => { fetchStories(); }, []);
@@ -47,6 +48,8 @@ const StoriesAdmin = () => {
     setUploading(true);
     try {
       let imageUrl = form.image_url;
+      let videoUrl: string | null = null;
+
       if (imageFile) {
         const ext = imageFile.name.split(".").pop();
         const path = `${crypto.randomUUID()}.${ext}`;
@@ -55,15 +58,27 @@ const StoriesAdmin = () => {
         const { data: urlData } = supabase.storage.from("stories").getPublicUrl(path);
         imageUrl = urlData.publicUrl;
       }
+
+      if (videoFile) {
+        const ext = videoFile.name.split(".").pop();
+        const path = `videos/${crypto.randomUUID()}.${ext}`;
+        const { error: uploadError } = await supabase.storage.from("stories").upload(path, videoFile);
+        if (uploadError) throw uploadError;
+        const { data: urlData } = supabase.storage.from("stories").getPublicUrl(path);
+        videoUrl = urlData.publicUrl;
+      }
+
       const { error: insertError } = await supabase.from("stories").insert({
         title: form.title,
         image_url: imageUrl,
+        video_url: videoUrl,
         movie_id: form.movie_id || null,
         sort_order: stories.length,
       });
       if (insertError) throw insertError;
       setForm({ title: "", image_url: "", movie_id: "" });
       setImageFile(null);
+      setVideoFile(null);
       fetchStories();
       toast({ title: "Стори добавлена ✅" });
     } catch (e: any) {
@@ -106,8 +121,12 @@ const StoriesAdmin = () => {
               <Input value={form.movie_id} onChange={(e) => setForm({ ...form, movie_id: e.target.value })} placeholder="uuid фильма для перехода" />
             </div>
             <div>
-              <Label>Изображение (загрузить)</Label>
+              <Label>📷 Изображение (обложка)</Label>
               <Input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
+            </div>
+            <div>
+              <Label>🎥 Видео из галереи (опционально)</Label>
+              <Input type="file" accept="video/*" onChange={(e) => setVideoFile(e.target.files?.[0] || null)} />
             </div>
             <div>
               <Label>Или URL изображения</Label>
