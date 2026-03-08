@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { Film, Star, Clock, Share2, ChevronLeft, ChevronRight, Crown, Radio } from "lucide-react";
+import { Film, Star, Clock, Share2, ChevronLeft, ChevronRight, Crown, Radio, Globe } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { isVip } from "@/lib/userStore";
 import HeroSlider from "@/components/HeroSlider";
@@ -7,9 +7,10 @@ import SearchBar from "@/components/SearchBar";
 import { supabase } from "@/integrations/supabase/client";
 import { useAutoRegister } from "@/hooks/useAutoRegister";
 import { NotificationBell } from "@/components/NotificationBell";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
 import Stories from "@/components/Stories";
+import { useI18n, LANGUAGES } from "@/lib/i18n";
 
 interface DBMovie {
   id: string;
