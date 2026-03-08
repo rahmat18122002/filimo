@@ -22,7 +22,7 @@ import SliderAdmin from "./pages/admin/SliderAdmin";
 import SettingsAdmin from "./pages/admin/SettingsAdmin";
 import CategoriesAdmin from "./pages/admin/CategoriesAdmin";
 import LiveChannelsAdmin from "./pages/admin/LiveChannelsAdmin";
-
+import StoriesAdmin from "./pages/admin/StoriesAdmin";
 
 const queryClient = new QueryClient();
 
