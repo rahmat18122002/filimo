@@ -160,6 +160,9 @@ export type Database = {
           id: string
           is_active: boolean
           name: string
+          name_en: string | null
+          name_fa: string | null
+          name_tg: string | null
           sort_order: number
         }
         Insert: {
@@ -167,6 +170,9 @@ export type Database = {
           id?: string
           is_active?: boolean
           name: string
+          name_en?: string | null
+          name_fa?: string | null
+          name_tg?: string | null
           sort_order?: number
         }
         Update: {
@@ -174,6 +180,9 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
+          name_en?: string | null
+          name_fa?: string | null
+          name_tg?: string | null
           sort_order?: number
         }
         Relationships: []
@@ -259,6 +268,9 @@ export type Database = {
         Row: {
           created_at: string
           description: string
+          description_en: string | null
+          description_fa: string | null
+          description_tg: string | null
           duration: string
           genre: string[]
           id: string
@@ -267,12 +279,18 @@ export type Database = {
           rating: number
           sort_order: number
           title: string
+          title_en: string | null
+          title_fa: string | null
+          title_tg: string | null
           trailer_url: string | null
           year: number
         }
         Insert: {
           created_at?: string
           description?: string
+          description_en?: string | null
+          description_fa?: string | null
+          description_tg?: string | null
           duration?: string
           genre?: string[]
           id?: string
@@ -281,12 +299,18 @@ export type Database = {
           rating?: number
           sort_order?: number
           title: string
+          title_en?: string | null
+          title_fa?: string | null
+          title_tg?: string | null
           trailer_url?: string | null
           year?: number
         }
         Update: {
           created_at?: string
           description?: string
+          description_en?: string | null
+          description_fa?: string | null
+          description_tg?: string | null
           duration?: string
           genre?: string[]
           id?: string
@@ -295,6 +319,9 @@ export type Database = {
           rating?: number
           sort_order?: number
           title?: string
+          title_en?: string | null
+          title_fa?: string | null
+          title_tg?: string | null
           trailer_url?: string | null
           year?: number
         }
