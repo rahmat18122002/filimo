@@ -6,9 +6,11 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-// Known Sputnik Tokyo M3U sources
+// Sputnik M3U sources: Iran, Tajikistan, Russia, Afghanistan
 const SPUTNIK_SOURCES = [
   "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/ir.m3u",
+  "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/tj.m3u",
+  "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/ru.m3u",
   "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/af.m3u",
 ];
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ImageIcon, CheckCircle, XCircle, Clock, User } from "lucide-react";
+import { ImageIcon, CheckCircle, XCircle, Clock, User, Trash2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -73,6 +73,12 @@ const PaymentsAdmin = () => {
     load();
   };
 
+  const deletePayment = async (id: string) => {
+    await supabase.from("vip_payments").delete().eq("id", id);
+    toast({ title: "Платёж удалён", variant: "destructive" });
+    load();
+  };
+
   const statusBadge = (status: string) => {
     switch (status) {
       case "pending": return <Badge variant="outline" className="gap-1 text-amber-400 border-amber-400/30"><Clock className="h-3 w-3" /> Ожидает</Badge>;
@@ -122,16 +128,21 @@ const PaymentsAdmin = () => {
                 </div>
               </div>
 
-              {p.status === "pending" && (
-                <div className="flex gap-2">
-                  <Button size="sm" className="gap-1" onClick={() => handleAction(p, "approved")}>
-                    <CheckCircle className="h-4 w-4" /> Принять
-                  </Button>
-                  <Button size="sm" variant="destructive" className="gap-1" onClick={() => handleAction(p, "rejected")}>
-                    <XCircle className="h-4 w-4" /> Отклонить
-                  </Button>
-                </div>
-              )}
+              <div className="flex gap-2">
+                {p.status === "pending" && (
+                  <>
+                    <Button size="sm" className="gap-1" onClick={() => handleAction(p, "approved")}>
+                      <CheckCircle className="h-4 w-4" /> Принять
+                    </Button>
+                    <Button size="sm" variant="destructive" className="gap-1" onClick={() => handleAction(p, "rejected")}>
+                      <XCircle className="h-4 w-4" /> Отклонить
+                    </Button>
+                  </>
+                )}
+                <Button size="sm" variant="ghost" className="gap-1 text-destructive hover:text-destructive" onClick={() => deletePayment(p.id)}>
+                  <Trash2 className="h-4 w-4" /> Удалить
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ))}

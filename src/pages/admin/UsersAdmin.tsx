@@ -40,6 +40,12 @@ const UsersAdmin = () => {
     loadUsers();
   };
 
+  const deleteUser = async (id: string) => {
+    await supabase.from("app_users").delete().eq("id", id);
+    toast({ title: "Пользователь удалён", variant: "destructive" });
+    loadUsers();
+  };
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -91,6 +97,10 @@ const UsersAdmin = () => {
                           <DropdownMenuItem onClick={() => toggleVip(u)} className="gap-2">
                             <Crown className="h-4 w-4" />
                             {u.is_vip ? "Снять VIP" : "Назначить VIP"}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => deleteUser(u.id)} className="gap-2 text-destructive focus:text-destructive">
+                            <Ban className="h-4 w-4" />
+                            Удалить / Заблокировать
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
