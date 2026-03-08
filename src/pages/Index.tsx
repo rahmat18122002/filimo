@@ -9,6 +9,7 @@ import { useAutoRegister } from "@/hooks/useAutoRegister";
 import { NotificationBell } from "@/components/NotificationBell";
 import { motion } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
+import Stories from "@/components/Stories";
 
 interface DBMovie {
   id: string;
@@ -277,6 +278,9 @@ const Index = () => {
       </header>
 
       <HeroSlider />
+
+      {/* Stories */}
+      <Stories />
 
       {/* Catalog Section */}
       <main id="catalog" className="container mx-auto px-6 py-12">

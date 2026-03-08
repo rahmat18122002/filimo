@@ -22,7 +22,7 @@ import SliderAdmin from "./pages/admin/SliderAdmin";
 import SettingsAdmin from "./pages/admin/SettingsAdmin";
 import CategoriesAdmin from "./pages/admin/CategoriesAdmin";
 import LiveChannelsAdmin from "./pages/admin/LiveChannelsAdmin";
-
+import StoriesAdmin from "./pages/admin/StoriesAdmin";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +49,7 @@ const App = () => (
             <Route path="payments" element={<PaymentsAdmin />} />
             <Route path="slider" element={<SliderAdmin />} />
             <Route path="live-channels" element={<LiveChannelsAdmin />} />
+            <Route path="stories" element={<StoriesAdmin />} />
             <Route path="settings" element={<SettingsAdmin />} />
             
           </Route>

@@ -6,12 +6,29 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-// Sputnik M3U sources: Iran, Tajikistan, Russia, Afghanistan
+// Sputnik + Yahsat M3U sources
 const SPUTNIK_SOURCES = [
+  // Iran (Gem TV, etc.)
   "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/ir.m3u",
+  // Tajikistan
   "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/tj.m3u",
+  // Russia
   "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/ru.m3u",
+  // Afghanistan
   "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/af.m3u",
+  // Turkey (some Yahsat channels)
+  "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/tr.m3u",
+  // UAE (Yahsat home region)
+  "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/ae.m3u",
+];
+
+// Priority channels to always include (matched by name)
+const PRIORITY_CHANNELS = [
+  "gem", "gem tv", "gem series", "gem classic", "gem kids", "gem junior",
+  "gem bollywood", "gem action", "gem drama", "gem comedy",
+  "manoto", "iran international", "bbc persian",
+  "первый канал", "россия", "нтв", "тв центр",
+  "шабакаи якум", "шабакаи дуюм", "safina",
 ];
 
 interface ParsedChannel {
@@ -96,6 +113,12 @@ Deno.serve(async (req) => {
     let inserted = 0;
     for (let i = 0; i < allChannels.length; i++) {
       const ch = allChannels[i];
+      
+      // Mark priority channels with a Yahsat/Gem category
+      const nameLower = ch.name.toLowerCase();
+      const isPriority = PRIORITY_CHANNELS.some(p => nameLower.includes(p));
+      const category = isPriority && nameLower.includes("gem") ? "Gem TV 📡" : ch.category;
+      
       const { error } = await supabase
         .from("live_channels")
         .upsert(
@@ -103,9 +126,9 @@ Deno.serve(async (req) => {
             name: ch.name,
             logo_url: ch.logo_url,
             stream_url: ch.stream_url,
-            category: ch.category,
+            category: category,
             source: "sputnik",
-            sort_order: i,
+            sort_order: isPriority ? i : 1000 + i,
             is_active: true,
           },
           { onConflict: "name,source", ignoreDuplicates: false }
