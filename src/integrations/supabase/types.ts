@@ -463,6 +463,35 @@ export type Database = {
           },
         ]
       }
+      story_views: {
+        Row: {
+          created_at: string
+          device_id: string
+          id: string
+          story_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          id?: string
+          story_id: string
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          id?: string
+          story_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_views_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vip_cards: {
         Row: {
           card_label: string | null
