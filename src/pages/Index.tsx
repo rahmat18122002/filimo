@@ -166,11 +166,13 @@ const MovieCarousel = ({ movies, carouselSpeed }: { movies: DBMovie[]; carouselS
 
 const Index = () => {
   const { user } = useAutoRegister();
+  const { t, lang, setLang, dir } = useI18n();
   const [search, setSearch] = useState("");
   const [movies, setMovies] = useState<DBMovie[]>([]);
   const [categories, setCategories] = useState<DBCategory[]>([]);
   const [carouselSpeed, setCarouselSpeed] = useState(5);
   const [appName, setAppName] = useState("Filimo");
+  const [showLangPicker, setShowLangPicker] = useState(false);
   const navigate = useNavigate();
 
   const loadData = useCallback(() => {
