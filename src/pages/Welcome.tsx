@@ -85,7 +85,7 @@ const Welcome = () => {
             ) : (
               <UserPlus className="h-5 w-5" />
             )}
-            Войти в приложение
+            {t("app.enter")}
           </Button>
         </motion.div>
 
