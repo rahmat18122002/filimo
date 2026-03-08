@@ -217,56 +217,6 @@ const Index = () => {
             </span>
           </div>
           <div className="flex items-center gap-4">
-            {user && isVip(user) && user.vip_until && (
-              <div
-                className="flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1.5 cursor-pointer"
-                onClick={() => navigate("/vip")}
-              >
-                <Crown className="h-4 w-4 text-accent" />
-                <span className="text-xs font-bold text-accent">
-                  VIP — {Math.max(0, Math.ceil((new Date(user.vip_until).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))}
-                </span>
-              </div>
-            )}
-            {user && isVip(user) && !user.vip_until && (
-              <div className="flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1.5">
-                <Crown className="h-4 w-4 text-accent" />
-                <span className="text-xs font-bold text-accent">VIP ∞</span>
-              </div>
-            )}
-            {user && !isVip(user) && (
-              <div
-                className="flex items-center gap-1.5 rounded-full border border-accent/30 px-3 py-1.5 cursor-pointer transition-colors hover:bg-accent/10"
-                onClick={() => navigate("/vip")}
-              >
-                <Crown className="h-4 w-4 text-muted-foreground" />
-                <span className="text-xs font-medium text-muted-foreground">VIP</span>
-              </div>
-            )}
-            {/* Live TV Button */}
-            <motion.button
-              onClick={() => {
-                if (user && isVip(user)) {
-                  navigate("/live");
-                } else {
-                  navigate("/vip");
-                  toast({ title: "Только для VIP", description: "Купите VIP для доступа к Live TV" });
-                }
-              }}
-              className={`relative flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all ${
-                user && isVip(user)
-                  ? "bg-destructive/15 text-destructive border border-destructive/30 hover:bg-destructive/25"
-                  : "bg-secondary text-muted-foreground border border-border"
-              }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-destructive" />
-              </span>
-              Live
-            </motion.button>
             {user && <NotificationBell userId={user.id} />}
             <nav className="hidden items-center gap-8 text-sm font-medium text-muted-foreground md:flex">
               <a href="#catalog" className="transition-colors hover:text-foreground">Каталог</a>
@@ -365,11 +315,71 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border py-8">
+      <footer className="border-t border-border py-8 pb-24">
         <div className="container mx-auto px-6 text-center text-sm text-muted-foreground">
           © 2026 КиноПоиск — Каталог фильмов
         </div>
       </footer>
+
+      {/* Bottom Navigation Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur-md safe-area-bottom">
+        <div className="flex items-center justify-around px-4 py-3">
+          {/* VIP Button */}
+          <motion.button
+            onClick={() => navigate("/vip")}
+            className="flex flex-col items-center gap-1"
+            whileTap={{ scale: 0.9 }}
+          >
+            <div className={`rounded-full p-2.5 ${user && isVip(user) ? "bg-accent/20" : "bg-secondary"}`}>
+              <Crown className={`h-5 w-5 ${user && isVip(user) ? "text-accent" : "text-muted-foreground"}`} />
+            </div>
+            <span className={`text-[10px] font-bold ${user && isVip(user) ? "text-accent" : "text-muted-foreground"}`}>
+              {user && isVip(user) && user.vip_until
+                ? `VIP — ${Math.max(0, Math.ceil((new Date(user.vip_until).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))}`
+                : user && isVip(user)
+                ? "VIP ∞"
+                : "VIP"}
+            </span>
+          </motion.button>
+
+          {/* Home Button */}
+          <motion.button
+            onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); }}
+            className="flex flex-col items-center gap-1"
+            whileTap={{ scale: 0.9 }}
+          >
+            <div className="rounded-full bg-primary/10 p-2.5">
+              <Film className="h-5 w-5 text-primary" />
+            </div>
+            <span className="text-[10px] font-bold text-primary">Главная</span>
+          </motion.button>
+
+          {/* Live TV Button */}
+          <motion.button
+            onClick={() => {
+              if (user && isVip(user)) {
+                navigate("/live");
+              } else {
+                navigate("/vip");
+                toast({ title: "Только для VIP", description: "Купите VIP для доступа к Live TV" });
+              }
+            }}
+            className="flex flex-col items-center gap-1"
+            whileTap={{ scale: 0.9 }}
+          >
+            <div className={`relative rounded-full p-2.5 ${user && isVip(user) ? "bg-destructive/15" : "bg-secondary"}`}>
+              <Radio className={`h-5 w-5 ${user && isVip(user) ? "text-destructive" : "text-muted-foreground"}`} />
+              {user && isVip(user) && (
+                <span className="absolute right-1 top-1 flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-destructive" />
+                </span>
+              )}
+            </div>
+            <span className={`text-[10px] font-bold ${user && isVip(user) ? "text-destructive" : "text-muted-foreground"}`}>Live</span>
+          </motion.button>
+        </div>
+      </div>
     </div>
   );
 };
