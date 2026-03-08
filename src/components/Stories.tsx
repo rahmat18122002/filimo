@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Play, Pause } from "lucide-react";
+import { X, Play, Pause, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
@@ -17,6 +17,68 @@ interface Story {
   created_at: string;
 }
 
+interface FloatingHeart {
+  id: number;
+  x: number;
+  size: number;
+  duration: number;
+  color: string;
+}
+
+const HEART_COLORS = ["#ff3040", "#ff6b81", "#ff4757", "#e84393", "#fd79a8"];
+
+const FloatingHearts = () => {
+  const [hearts, setHearts] = useState<FloatingHeart[]>([]);
+  const counterRef = useRef(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const id = counterRef.current++;
+      const heart: FloatingHeart = {
+        id,
+        x: 10 + Math.random() * 50,
+        size: 16 + Math.random() * 18,
+        duration: 2 + Math.random() * 1.5,
+        color: HEART_COLORS[Math.floor(Math.random() * HEART_COLORS.length)],
+      };
+      setHearts((prev) => [...prev.slice(-15), heart]);
+    }, 600 + Math.random() * 400);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="absolute bottom-20 left-0 w-24 h-[60%] pointer-events-none z-20 overflow-hidden">
+      <AnimatePresence>
+        {hearts.map((h) => (
+          <motion.div
+            key={h.id}
+            initial={{ opacity: 1, y: 0, x: h.x, scale: 0.5 }}
+            animate={{
+              opacity: [1, 1, 0],
+              y: -400,
+              x: h.x + (Math.random() - 0.5) * 40,
+              scale: [0.5, 1.2, 0.8],
+              rotate: (Math.random() - 0.5) * 30,
+            }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: h.duration, ease: "easeOut" }}
+            onAnimationComplete={() =>
+              setHearts((prev) => prev.filter((p) => p.id !== h.id))
+            }
+            className="absolute bottom-0"
+          >
+            <Heart
+              className="fill-current"
+              style={{ color: h.color, width: h.size, height: h.size }}
+            />
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 const Stories = () => {
   const [stories, setStories] = useState<Story[]>([]);
   const [viewingIndex, setViewingIndex] = useState<number | null>(null);
@@ -24,6 +86,7 @@ const Stories = () => {
   const [paused, setPaused] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const pausedRef = useRef(false);
+  const viewedRef = useRef<Set<string>>(new Set());
   const navigate = useNavigate();
 
   const fetchStories = () => {
@@ -50,12 +113,24 @@ const Stories = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Keep ref in sync
+  // Record view when story opens
+  const recordView = useCallback(async (storyId: string) => {
+    if (viewedRef.current.has(storyId)) return;
+    viewedRef.current.add(storyId);
+    const deviceId = localStorage.getItem("device_id") || "unknown";
+    await supabase.from("story_views").insert({ story_id: storyId, device_id: deviceId });
+  }, []);
+
+  useEffect(() => {
+    if (viewingIndex !== null && stories[viewingIndex]) {
+      recordView(stories[viewingIndex].id);
+    }
+  }, [viewingIndex, stories, recordView]);
+
   useEffect(() => {
     pausedRef.current = paused;
   }, [paused]);
 
-  // Reset pause on story change
   useEffect(() => {
     setPaused(false);
   }, [viewingIndex]);
@@ -63,7 +138,6 @@ const Stories = () => {
   const currentStory = viewingIndex !== null ? stories[viewingIndex] : null;
   const isVideo = currentStory?.video_url;
 
-  // Auto-progress for images
   useEffect(() => {
     if (viewingIndex === null || isVideo) return;
     setProgress(0);
@@ -85,7 +159,6 @@ const Stories = () => {
     return () => clearInterval(timer);
   }, [viewingIndex, stories.length, isVideo]);
 
-  // Pause/play video
   useEffect(() => {
     if (!videoRef.current) return;
     if (paused) {
@@ -143,7 +216,7 @@ const Stories = () => {
         ))}
       </div>
 
-      {/* Fullscreen story viewer - rendered via portal to escape stacking context */}
+      {/* Fullscreen story viewer */}
       {createPortal(
         <AnimatePresence>
           {viewingIndex !== null && stories[viewingIndex] && (
@@ -167,20 +240,14 @@ const Stories = () => {
                 ))}
               </div>
 
-              {/* Title + controls row */}
+              {/* Title + controls */}
               <div className="absolute top-6 left-3 right-3 z-10 flex items-center justify-between">
                 <p className="text-white text-sm font-semibold truncate flex-1">{stories[viewingIndex].title}</p>
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={togglePause}
-                    className="text-white/70 hover:text-white p-1 transition-colors"
-                  >
+                  <button onClick={togglePause} className="text-white/70 hover:text-white p-1 transition-colors">
                     {paused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
                   </button>
-                  <button
-                    onClick={() => setViewingIndex(null)}
-                    className="text-white/70 hover:text-white p-1 transition-colors"
-                  >
+                  <button onClick={() => setViewingIndex(null)} className="text-white/70 hover:text-white p-1 transition-colors">
                     <X className="h-5 w-5" />
                   </button>
                 </div>
@@ -209,6 +276,9 @@ const Stories = () => {
                 />
               )}
 
+              {/* Floating hearts animation */}
+              <FloatingHearts />
+
               {/* Navigate left/right */}
               <button
                 onClick={() => setViewingIndex(Math.max(0, viewingIndex - 1))}
@@ -225,7 +295,7 @@ const Stories = () => {
                 className="absolute right-0 top-0 bottom-0 w-1/3 z-10"
               />
 
-              {/* Bottom button - URL or movie link */}
+              {/* Bottom button */}
               {(stories[viewingIndex].button_url || stories[viewingIndex].movie_id) && (
                 <button
                   onClick={() => {
