@@ -90,7 +90,7 @@ const Welcome = () => {
         </motion.div>
 
         <p className="mt-4 text-xs text-muted-foreground/60">
-          Регистрация автоматическая — просто нажмите кнопку
+          {t("app.auto_register")}
         </p>
       </motion.div>
     </div>
