@@ -73,10 +73,12 @@ const StoriesAdmin = () => {
         image_url: imageUrl,
         video_url: videoUrl,
         movie_id: form.movie_id || null,
+        button_url: form.button_url || null,
+        button_label: form.button_label || "Подробнее",
         sort_order: stories.length,
       });
       if (insertError) throw insertError;
-      setForm({ title: "", image_url: "", movie_id: "" });
+      setForm({ title: "", image_url: "", movie_id: "", button_url: "", button_label: "" });
       setImageFile(null);
       setVideoFile(null);
       fetchStories();
