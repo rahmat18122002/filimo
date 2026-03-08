@@ -60,7 +60,7 @@ const MoviesAdmin = () => {
 
   const openNew = () => {
     setEditMovie(null);
-    setForm({ title: "", year: "", rating: "", genre: "", description: "", poster: "", duration: "", trailer_url: "", is_featured: false });
+    setForm({ title: "", title_en: "", title_tg: "", title_fa: "", year: "", rating: "", genre: "", description: "", description_en: "", description_tg: "", description_fa: "", poster: "", duration: "", trailer_url: "", is_featured: false });
     setIsOpen(true);
   };
 
