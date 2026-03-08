@@ -41,9 +41,9 @@ const CategoriesAdmin = () => {
     setForm({ name: "", name_en: "", name_tg: "", name_fa: "", sort_order: String(categories.length), is_active: true });
   };
 
-  const openEdit = (c: Category) => {
+  const openEdit = (c: any) => {
     setEditCat(c);
-    setForm({ name: c.name, sort_order: String(c.sort_order), is_active: c.is_active });
+    setForm({ name: c.name, name_en: c.name_en || "", name_tg: c.name_tg || "", name_fa: c.name_fa || "", sort_order: String(c.sort_order), is_active: c.is_active });
     setIsOpen(true);
   };
 
