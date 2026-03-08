@@ -115,7 +115,7 @@ const MovieCarousel = ({ movies, carouselSpeed }: { movies: DBMovie[]; carouselS
             <div className="mt-3 px-1">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-1 group-hover:text-primary transition-colors flex-1">
-                  {movie.title}
+                  {getLocalizedField(movie, "title", lang)}
                 </h3>
                 <button
                   onClick={async (e) => {
