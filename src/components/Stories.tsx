@@ -14,6 +14,7 @@ interface Story {
   button_url: string | null;
   button_label: string | null;
   is_active: boolean;
+  created_at: string;
 }
 
 const Stories = () => {
