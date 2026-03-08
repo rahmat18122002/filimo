@@ -20,7 +20,7 @@ const CategoriesAdmin = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [editCat, setEditCat] = useState<Category | null>(null);
-  const [form, setForm] = useState({ name: "", sort_order: "0", is_active: true });
+  const [form, setForm] = useState({ name: "", name_en: "", name_tg: "", name_fa: "", sort_order: "0", is_active: true });
 
   // Carousel speed
   const [carouselSpeed, setCarouselSpeed] = useState("5");
