@@ -209,7 +209,7 @@ const Index = () => {
   }, [categories, searchFiltered]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" dir={dir}>
       {/* Header with Stories inline */}
       <header className="relative z-20 w-full bg-background">
         <div className="container mx-auto flex items-center gap-3 px-4 py-3">
@@ -277,7 +277,7 @@ const Index = () => {
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
               <Film className="mb-4 h-12 w-12" />
-              <p className="text-lg font-medium">Фильмы не найдены</p>
+              <p className="text-lg font-medium">{t("movies.not_found")}</p>
             </div>
           )
         )}
@@ -297,7 +297,7 @@ const Index = () => {
             {moviesByCategory.length === 0 && movies.length > 0 && (
               <section>
                 <h2 className="mb-4 text-xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>
-                  Все фильмы
+                  {t("movies.all")}
                 </h2>
                 <MovieCarousel movies={movies} carouselSpeed={carouselSpeed} />
               </section>
@@ -306,7 +306,7 @@ const Index = () => {
             {movies.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
                 <Film className="mb-4 h-12 w-12" />
-                <p className="text-lg font-medium">Фильмы не найдены</p>
+                <p className="text-lg font-medium">{t("movies.not_found")}</p>
               </div>
             )}
           </div>
@@ -316,9 +316,37 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border py-8 pb-24">
         <div className="container mx-auto px-6 text-center text-sm text-muted-foreground">
-          © 2026 КиноПоиск — Каталог фильмов
+          {t("footer.copyright")}
         </div>
       </footer>
+
+      {/* Language picker popup */}
+      <AnimatePresence>
+        {showLangPicker && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[60] bg-background border border-border rounded-2xl shadow-xl p-3 min-w-[200px]"
+          >
+            {LANGUAGES.map((l) => (
+              <button
+                key={l.code}
+                onClick={() => {
+                  setLang(l.code);
+                  setShowLangPicker(false);
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                  lang === l.code ? "bg-primary/10 text-primary" : "text-foreground hover:bg-secondary"
+                }`}
+              >
+                <span className="text-lg">{l.flag}</span>
+                <span>{l.label}</span>
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Bottom Navigation Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur-md safe-area-bottom">
@@ -337,7 +365,7 @@ const Index = () => {
                 ? `VIP — ${Math.max(0, Math.ceil((new Date(user.vip_until).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))}`
                 : user && isVip(user)
                 ? "VIP ∞"
-                : "VIP"}
+                : t("nav.vip")}
             </span>
           </motion.button>
 
@@ -350,7 +378,7 @@ const Index = () => {
             <div className="rounded-full bg-primary/10 p-2.5">
               <Film className="h-5 w-5 text-primary" />
             </div>
-            <span className="text-[10px] font-bold text-primary">Главная</span>
+            <span className="text-[10px] font-bold text-primary">{t("nav.home")}</span>
           </motion.button>
 
           {/* Live TV Button */}
@@ -360,7 +388,7 @@ const Index = () => {
                 navigate("/live");
               } else {
                 navigate("/vip");
-                toast({ title: "Только для VIP", description: "Купите VIP для доступа к Live TV" });
+                toast({ title: t("vip.only"), description: t("vip.buy") });
               }
             }}
             className="flex flex-col items-center gap-1"
@@ -375,7 +403,21 @@ const Index = () => {
                 </span>
               )}
             </div>
-            <span className={`text-[10px] font-bold ${user && isVip(user) ? "text-destructive" : "text-muted-foreground"}`}>Live</span>
+            <span className={`text-[10px] font-bold ${user && isVip(user) ? "text-destructive" : "text-muted-foreground"}`}>{t("nav.live")}</span>
+          </motion.button>
+
+          {/* Language Button */}
+          <motion.button
+            onClick={() => setShowLangPicker(!showLangPicker)}
+            className="flex flex-col items-center gap-1"
+            whileTap={{ scale: 0.9 }}
+          >
+            <div className={`rounded-full p-2.5 ${showLangPicker ? "bg-primary/10" : "bg-secondary"}`}>
+              <Globe className={`h-5 w-5 ${showLangPicker ? "text-primary" : "text-muted-foreground"}`} />
+            </div>
+            <span className={`text-[10px] font-bold ${showLangPicker ? "text-primary" : "text-muted-foreground"}`}>
+              {LANGUAGES.find((l) => l.code === lang)?.flag || "🌐"}
+            </span>
           </motion.button>
         </div>
       </div>
