@@ -38,7 +38,7 @@ const MoviesAdmin = () => {
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [editMovie, setEditMovie] = useState<Movie | null>(null);
-  const [form, setForm] = useState({ title: "", year: "", rating: "", genre: "", description: "", poster: "", duration: "", trailer_url: "", is_featured: false });
+  const [form, setForm] = useState({ title: "", title_en: "", title_tg: "", title_fa: "", year: "", rating: "", genre: "", description: "", description_en: "", description_tg: "", description_fa: "", poster: "", duration: "", trailer_url: "", is_featured: false });
   const [posterFile, setPosterFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   
