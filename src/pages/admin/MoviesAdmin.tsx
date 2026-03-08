@@ -93,9 +93,11 @@ const MoviesAdmin = () => {
         posterUrl = await uploadPoster(posterFile);
       }
       const payload = {
-        title: form.title, year: Number(form.year) || 2024, rating: Number(form.rating) || 0,
+        title: form.title, title_en: form.title_en, title_tg: form.title_tg, title_fa: form.title_fa,
+        year: Number(form.year) || 2024, rating: Number(form.rating) || 0,
         genre: form.genre.split(",").map((g) => g.trim()),
-        description: form.description, poster: posterUrl, duration: form.duration,
+        description: form.description, description_en: form.description_en, description_tg: form.description_tg, description_fa: form.description_fa,
+        poster: posterUrl, duration: form.duration,
         trailer_url: form.trailer_url || null, is_featured: form.is_featured,
       };
       if (editMovie) {
