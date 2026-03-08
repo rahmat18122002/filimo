@@ -10,7 +10,7 @@ import { NotificationBell } from "@/components/NotificationBell";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
 import Stories from "@/components/Stories";
-import { useI18n, LANGUAGES, getLocalizedField } from "@/lib/i18n";
+import { useI18n, LANGUAGES, getLocalizedField, type Lang } from "@/lib/i18n";
 
 interface DBMovie {
   id: string;
