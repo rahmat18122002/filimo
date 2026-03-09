@@ -297,9 +297,9 @@ const Stories = () => {
                   e.stopPropagation();
                   setLikeTrigger((c) => c + 1);
                 }}
-                className="absolute bottom-10 right-4 z-30 p-2 rounded-full bg-black/30 backdrop-blur-sm border border-white/20 hover:bg-black/50 transition-colors"
+                className="absolute bottom-10 left-4 z-30 p-2 rounded-full bg-black/30 backdrop-blur-sm border border-white/20 hover:bg-black/50 transition-colors"
               >
-                <Heart className="h-7 w-7 text-white fill-red-500" />
+                <Heart className="h-7 w-7 text-white fill-destructive" />
               </motion.button>
 
               {/* Navigate left/right */}
