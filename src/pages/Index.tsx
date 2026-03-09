@@ -36,39 +36,12 @@ const formatViewCount = (count: number): string => {
   return String(count);
 };
 
-const LiveViewCount = ({ baseCount }: { baseCount: number }) => {
-  const [extra, setExtra] = useState(0);
-  const [showPlus, setShowPlus] = useState(false);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setExtra((prev) => prev + 10);
-      setShowPlus(true);
-      setTimeout(() => setShowPlus(false), 2000);
-    }, 10000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="flex items-center gap-1 text-xs text-muted-foreground relative">
-      <Eye className="h-3.5 w-3.5" />
-      <span className="font-medium">{formatViewCount(baseCount + extra)}</span>
-      <AnimatePresence>
-        {showPlus && (
-          <motion.span
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: -8 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 1.5 }}
-            className="absolute -top-1 left-8 text-[10px] font-bold text-primary"
-          >
-            +10
-          </motion.span>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
+const ViewCount = ({ count }: { count: number }) => (
+  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+    <Eye className="h-3.5 w-3.5" />
+    <span className="font-medium">{formatViewCount(count)}</span>
+  </div>
+);
 
 const MovieCarousel = ({ movies, carouselSpeed, lang }: { movies: DBMovie[]; carouselSpeed: number; lang: Lang }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -158,7 +131,7 @@ const MovieCarousel = ({ movies, carouselSpeed, lang }: { movies: DBMovie[]; car
                 {getLocalizedField(movie, "title", lang)}
               </h3>
               <div className="mt-2 flex items-center justify-between">
-                <LiveViewCount baseCount={movie.view_count} />
+                <ViewCount count={movie.view_count} />
                 <button
                   onClick={async (e) => {
                     e.stopPropagation();
@@ -302,7 +275,7 @@ const Index = () => {
                   <div className="mt-3 px-1">
                     <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-1">{getLocalizedField(movie, "title", lang)}</h3>
                     <div className="mt-2 flex items-center justify-between">
-                      <LiveViewCount baseCount={movie.view_count} />
+                      <ViewCount count={movie.view_count} />
                       <Share2 className="h-4 w-4 text-muted-foreground" />
                     </div>
                   </div>
