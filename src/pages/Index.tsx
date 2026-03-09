@@ -30,6 +30,12 @@ interface DBCategory {
   sort_order: number;
 }
 
+const formatViewCount = (count: number): string => {
+  if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
+  if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
+  return String(count);
+};
+
 const MovieCarousel = ({ movies, carouselSpeed, lang }: { movies: DBMovie[]; carouselSpeed: number; lang: Lang }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -150,12 +156,10 @@ const MovieCarousel = ({ movies, carouselSpeed, lang }: { movies: DBMovie[]; car
                   <Clock className="h-3 w-3" />
                   {movie.duration}
                 </span>
-                {movie.view_count > 0 && (
-                  <span className="flex items-center gap-1">
-                    <Eye className="h-3 w-3" />
-                    {movie.view_count >= 1000 ? `${(movie.view_count / 1000).toFixed(1)}K` : movie.view_count}
-                  </span>
-                )}
+              </div>
+              <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground/70">
+                <Eye className="h-3 w-3" />
+                <span>{formatViewCount(movie.view_count)}</span>
               </div>
             </div>
           </motion.div>
@@ -276,12 +280,10 @@ const Index = () => {
                     <div className="mt-1.5 flex items-center gap-3 text-xs text-muted-foreground">
                       <span>{movie.year}</span>
                       <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{movie.duration}</span>
-                      {movie.view_count > 0 && (
-                        <span className="flex items-center gap-1">
-                          <Eye className="h-3 w-3" />
-                          {movie.view_count >= 1000 ? `${(movie.view_count / 1000).toFixed(1)}K` : movie.view_count}
-                        </span>
-                      )}
+                    </div>
+                    <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground/70">
+                      <Eye className="h-3 w-3" />
+                      <span>{formatViewCount(movie.view_count)}</span>
                     </div>
                   </div>
                 </motion.div>
