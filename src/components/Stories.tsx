@@ -49,7 +49,7 @@ const FloatingHearts = ({ triggerCount }: { triggerCount: number }) => {
   }, [triggerCount]);
 
   return (
-    <div className="absolute bottom-16 right-2 w-24 pointer-events-none z-20" style={{ height: "70%" }}>
+    <div className="absolute bottom-16 left-2 w-24 pointer-events-none z-20" style={{ height: "70%" }}>
       <AnimatePresence>
         {hearts.map((h) => {
           const sway = (Math.random() - 0.5) * 60;
