@@ -301,13 +301,10 @@ const Index = () => {
                   </div>
                   <div className="mt-3 px-1">
                     <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-1">{getLocalizedField(movie, "title", lang)}</h3>
-                    <div className="mt-1.5 flex items-center gap-3 text-xs text-muted-foreground">
-                      <span>{movie.year}</span>
-                      <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{movie.duration}</span>
+                    <div className="mt-2 flex items-center justify-between">
+                      <LiveViewCount baseCount={movie.view_count} />
+                      <Share2 className="h-4 w-4 text-muted-foreground" />
                     </div>
-                    <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground/70">
-                      <Eye className="h-3 w-3" />
-                      <span>{formatViewCount(movie.view_count)}</span>
                     </div>
                   </div>
                 </motion.div>
