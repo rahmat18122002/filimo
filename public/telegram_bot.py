@@ -288,12 +288,82 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         sb.table("bot_settings").update({"value": "true"}).eq("key", "copy_protection").execute()
         await query.message.edit_text("🔒 Защита от копирования *включена*.", parse_mode="Markdown")
 
+    # ─── Add episode: list movies ───
+    elif query.data == "admin_add_episode":
+        if not is_admin(user.id):
+            return
+        res = sb.table("movies").select("id, title, year").order("created_at", desc=True).limit(20).execute()
+        movies = res.data or []
+        if not movies:
+            await query.message.edit_text("❌ Нет фильмов в базе.")
+            return
+        buttons = [
+            [InlineKeyboardButton(f"🎬 {m['title']} ({m['year']})", callback_data=f"ep_movie_{m['id']}")]
+            for m in movies
+        ]
+        await query.message.edit_text("Выберите фильм для добавления эпизода:", reply_markup=InlineKeyboardMarkup(buttons))
+
+    elif query.data.startswith("ep_movie_"):
+        if not is_admin(user.id):
+            return
+        movie_id = query.data.replace("ep_movie_", "")
+        context.user_data["adding_episode_movie_id"] = movie_id
+        # Count existing episodes
+        ep_res = sb.table("episodes").select("id", count="exact").eq("movie_id", movie_id).execute()
+        ep_count = ep_res.count or 0
+        movie_res = sb.table("movies").select("title").eq("id", movie_id).single().execute()
+        movie_title = movie_res.data["title"] if movie_res.data else "—"
+        context.user_data["adding_episode_next_part"] = ep_count + 1
+        await query.message.edit_text(
+            f"🎬 *{movie_title}*\n"
+            f"📺 Частей сейчас: *{ep_count}*\n\n"
+            f"Отправьте ссылки на новые части — каждая ссылка на отдельной строке.\n"
+            f"Нумерация начнётся с *{ep_count + 1}*.\n\n"
+            f"Или отправьте в формате:\n`название | ссылка | длительность`\n"
+            f"(длительность необязательна)",
+            parse_mode="Markdown"
+        )
+
 
 # ─── Text handler (search + add channel) ─────────────────────
 
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     text = update.message.text.strip()
+
+    # Admin adding episodes
+    if is_admin(user.id) and context.user_data.get("adding_episode_movie_id"):
+        movie_id = context.user_data.pop("adding_episode_movie_id")
+        next_part = context.user_data.pop("adding_episode_next_part", 1)
+        lines = [l.strip() for l in text.split("\n") if l.strip()]
+        added = 0
+        for i, line in enumerate(lines):
+            parts = [p.strip() for p in line.split("|")]
+            if len(parts) >= 2:
+                title_ep = parts[0]
+                url = parts[1]
+                duration = parts[2] if len(parts) > 2 else None
+            else:
+                # Just a URL
+                url = parts[0]
+                title_ep = f"Часть {next_part + i}"
+                duration = None
+            ep_data = {
+                "movie_id": movie_id,
+                "part_number": next_part + i,
+                "title": title_ep,
+                "video_url": url,
+                "is_free": (next_part + i) <= 3,
+            }
+            if duration:
+                ep_data["duration"] = duration
+            try:
+                sb.table("episodes").insert(ep_data).execute()
+                added += 1
+            except Exception as e:
+                logger.error(f"Episode insert error: {e}")
+        await update.message.reply_text(f"✅ Добавлено {added} эпизод(ов)!")
+        return
 
     # Admin adding channel
     if is_admin(user.id) and context.user_data.get("adding_channel_type"):
@@ -373,6 +443,7 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     buttons = [
         [InlineKeyboardButton("➕ Доб. канал", callback_data="admin_add_channel")],
         [InlineKeyboardButton("❌ Удалить канал", callback_data="admin_del_channel")],
+        [InlineKeyboardButton("📺 Добавить эпизод", callback_data="admin_add_episode")],
         [InlineKeyboardButton("🔓 Открыть копировать", callback_data="admin_copy_on")],
         [InlineKeyboardButton("🔒 Закрыть копировать", callback_data="admin_copy_off")],
     ]
