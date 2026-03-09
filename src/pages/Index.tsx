@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { Film, Star, Clock, Share2, ChevronLeft, ChevronRight, Crown, Radio, Globe } from "lucide-react";
+import { Film, Star, Clock, Share2, ChevronLeft, ChevronRight, Crown, Radio, Globe, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { isVip } from "@/lib/userStore";
 import HeroSlider from "@/components/HeroSlider";
