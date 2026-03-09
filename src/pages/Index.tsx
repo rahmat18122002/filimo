@@ -21,6 +21,7 @@ interface DBMovie {
   description: string;
   poster: string;
   duration: string;
+  view_count: number;
 }
 
 interface DBCategory {
