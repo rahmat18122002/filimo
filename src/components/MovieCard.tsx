@@ -38,27 +38,49 @@ const MovieCard = ({ movie, index }: MovieCardProps) => {
         </div>
       </div>
 
-      <div className="mt-3 px-1">
-        <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-1 group-hover:text-primary transition-colors">
-          {movie.title}
-        </h3>
-        <div className="mt-1.5 flex items-center gap-3 text-xs text-muted-foreground">
-          <span>{movie.year}</span>
-          <span className="flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            {movie.duration}
-          </span>
-        </div>
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {movie.genre.slice(0, 2).map((g) => (
-            <span
-              key={g}
-              className="rounded-md bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary-foreground"
-            >
-              {g}
+      <div className="mt-3 px-1 flex items-start justify-between gap-2">
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-1 group-hover:text-primary transition-colors">
+            {movie.title}
+          </h3>
+          <div className="mt-1.5 flex items-center gap-3 text-xs text-muted-foreground">
+            <span>{movie.year}</span>
+            <span className="flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              {movie.duration}
             </span>
-          ))}
+          </div>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {movie.genre.slice(0, 2).map((g) => (
+              <span
+                key={g}
+                className="rounded-md bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary-foreground"
+              >
+                {g}
+              </span>
+            ))}
+          </div>
         </div>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const url = `${window.location.origin}/movie/${movie.id}`;
+            if (navigator.share) {
+              navigator.share({
+                title: movie.title,
+                text: movie.description,
+                url: url,
+              }).catch(console.error);
+            } else {
+              navigator.clipboard.writeText(url);
+              toast.success("Ссылка скопирована!");
+            }
+          }}
+          className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full transition-colors z-10 shrink-0"
+        >
+          <Share2 className="h-4 w-4" />
+        </button>
       </div>
     </motion.div>
   );
