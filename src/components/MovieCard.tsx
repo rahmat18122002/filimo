@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import { Star, Clock } from "lucide-react";
+import { Star, Clock, Share2 } from "lucide-react";
 import type { Movie } from "@/data/movies";
+import { toast } from "sonner";
 
 interface MovieCardProps {
   movie: Movie;
