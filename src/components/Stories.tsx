@@ -136,6 +136,7 @@ const Stories = () => {
 
   useEffect(() => {
     setPaused(false);
+    setLikeTrigger(0);
   }, [viewingIndex]);
 
   const currentStory = viewingIndex !== null ? stories[viewingIndex] : null;
