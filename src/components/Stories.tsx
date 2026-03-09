@@ -100,22 +100,38 @@ const Stories = () => {
   const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
   const navigate = useNavigate();
 
-  const fetchStories = () => {
-    supabase
+  const fetchStories = async () => {
+    const { data } = await supabase
       .from("stories")
       .select("*")
       .eq("is_active", true)
-      .order("sort_order")
-      .then(({ data }) => {
-        if (data) {
-          const now = Date.now();
-          const filtered = (data as Story[]).filter((s) => {
-            const created = new Date(s.created_at).getTime();
-            return now - created < 24 * 60 * 60 * 1000;
-          });
-          setStories(filtered);
-        }
+      .order("sort_order");
+    if (data) {
+      const now = Date.now();
+      const filtered = (data as Story[]).filter((s) => {
+        const created = new Date(s.created_at).getTime();
+        return now - created < 24 * 60 * 60 * 1000;
       });
+      setStories(filtered);
+
+      // Fetch like counts for all stories (last 24h only)
+      const storyIds = filtered.map((s) => s.id);
+      if (storyIds.length > 0) {
+        const cutoff = new Date(now - 24 * 60 * 60 * 1000).toISOString();
+        const { data: likes } = await supabase
+          .from("story_likes")
+          .select("story_id")
+          .in("story_id", storyIds)
+          .gte("created_at", cutoff);
+        if (likes) {
+          const counts: Record<string, number> = {};
+          likes.forEach((l: any) => {
+            counts[l.story_id] = (counts[l.story_id] || 0) + 1;
+          });
+          setLikeCounts(counts);
+        }
+      }
+    }
   };
 
   useEffect(() => {
