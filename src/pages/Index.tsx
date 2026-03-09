@@ -275,7 +275,7 @@ const Index = () => {
                   <div className="mt-3 px-1">
                     <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-1">{getLocalizedField(movie, "title", lang)}</h3>
                     <div className="mt-2 flex items-center justify-between">
-                      <LiveViewCount baseCount={movie.view_count} />
+                      <ViewCount count={movie.view_count} />
                       <Share2 className="h-4 w-4 text-muted-foreground" />
                     </div>
                   </div>
