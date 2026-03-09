@@ -466,6 +466,35 @@ export type Database = {
           },
         ]
       }
+      story_likes: {
+        Row: {
+          created_at: string
+          device_id: string
+          id: string
+          story_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          id?: string
+          story_id: string
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          id?: string
+          story_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_likes_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       story_views: {
         Row: {
           created_at: string
@@ -599,6 +628,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_old_story_likes: { Args: never; Returns: undefined }
       increment_movie_views: { Args: { movie_id: string }; Returns: undefined }
     }
     Enums: {
