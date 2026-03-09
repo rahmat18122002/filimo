@@ -97,6 +97,7 @@ const Stories = () => {
   const pausedRef = useRef(false);
   const viewedRef = useRef<Set<string>>(new Set());
   const [likeTrigger, setLikeTrigger] = useState(0);
+  const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
   const navigate = useNavigate();
 
   const fetchStories = () => {
