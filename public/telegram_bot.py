@@ -409,6 +409,7 @@ async def admin_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     buttons = [
         [InlineKeyboardButton("➕ Доб. канал", callback_data="admin_add_channel")],
         [InlineKeyboardButton("❌ Удалить канал", callback_data="admin_del_channel")],
+        [InlineKeyboardButton("📺 Добавить эпизод", callback_data="admin_add_episode")],
         [InlineKeyboardButton("🔓 Открыть копировать", callback_data="admin_copy_on")],
         [InlineKeyboardButton("🔒 Закрыть копировать", callback_data="admin_copy_off")],
     ]
