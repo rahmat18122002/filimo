@@ -97,24 +97,41 @@ const Stories = () => {
   const pausedRef = useRef(false);
   const viewedRef = useRef<Set<string>>(new Set());
   const [likeTrigger, setLikeTrigger] = useState(0);
+  const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
   const navigate = useNavigate();
 
-  const fetchStories = () => {
-    supabase
+  const fetchStories = async () => {
+    const { data } = await supabase
       .from("stories")
       .select("*")
       .eq("is_active", true)
-      .order("sort_order")
-      .then(({ data }) => {
-        if (data) {
-          const now = Date.now();
-          const filtered = (data as Story[]).filter((s) => {
-            const created = new Date(s.created_at).getTime();
-            return now - created < 24 * 60 * 60 * 1000;
-          });
-          setStories(filtered);
-        }
+      .order("sort_order");
+    if (data) {
+      const now = Date.now();
+      const filtered = (data as Story[]).filter((s) => {
+        const created = new Date(s.created_at).getTime();
+        return now - created < 24 * 60 * 60 * 1000;
       });
+      setStories(filtered);
+
+      // Fetch like counts for all stories (last 24h only)
+      const storyIds = filtered.map((s) => s.id);
+      if (storyIds.length > 0) {
+        const cutoff = new Date(now - 24 * 60 * 60 * 1000).toISOString();
+        const { data: likes } = await supabase
+          .from("story_likes")
+          .select("story_id")
+          .in("story_id", storyIds)
+          .gte("created_at", cutoff);
+        if (likes) {
+          const counts: Record<string, number> = {};
+          likes.forEach((l: any) => {
+            counts[l.story_id] = (counts[l.story_id] || 0) + 1;
+          });
+          setLikeCounts(counts);
+        }
+      }
+    }
   };
 
   useEffect(() => {
@@ -290,16 +307,24 @@ const Stories = () => {
               {/* Floating hearts animation */}
               <FloatingHearts triggerCount={likeTrigger} />
 
-              {/* Like button */}
+              {/* Like button with count */}
               <motion.button
                 whileTap={{ scale: 1.4 }}
-                onClick={(e) => {
+                onClick={async (e) => {
                   e.stopPropagation();
                   setLikeTrigger((c) => c + 1);
+                  const storyId = stories[viewingIndex!].id;
+                  const deviceId = localStorage.getItem("device_id") || "unknown";
+                  // Save like to DB
+                  await supabase.from("story_likes").insert({ story_id: storyId, device_id: deviceId });
+                  setLikeCounts((prev) => ({ ...prev, [storyId]: (prev[storyId] || 0) + 1 }));
                 }}
-                className="absolute bottom-10 left-4 z-30 p-2 rounded-full bg-black/30 backdrop-blur-sm border border-white/20 hover:bg-black/50 transition-colors"
+                className="absolute bottom-10 left-4 z-30 flex items-center gap-2 p-2 rounded-full bg-black/30 backdrop-blur-sm border border-white/20 hover:bg-black/50 transition-colors"
               >
                 <Heart className="h-7 w-7 text-white fill-destructive" />
+                <span className="text-white text-sm font-bold pr-1">
+                  {likeCounts[stories[viewingIndex!].id] || 0}
+                </span>
               </motion.button>
 
               {/* Navigate left/right */}
