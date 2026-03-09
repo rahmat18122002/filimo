@@ -41,13 +41,15 @@ const MovieDetail = () => {
 
   useEffect(() => {
     if (!id) return;
-    supabase.from("movies").select("*").eq("id", id).single().then(({ data, error }) => {
+    supabase.from("movies").select("*").eq("id", id).single().then(({ data }) => {
       if (data) setMovie(data as Movie);
       else setNotFound(true);
     });
     supabase.from("episodes").select("*").eq("movie_id", id).order("part_number").then(({ data }) => {
       if (data) setEpisodes(data as Episode[]);
     });
+    // Increment view count
+    supabase.rpc("increment_movie_views", { movie_id: id }).then(() => {});
     // Auto-register user if not yet registered (for shared links)
     autoRegister().then(setUser).catch(console.error);
   }, [id]);
