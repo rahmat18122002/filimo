@@ -283,6 +283,7 @@ export type Database = {
           title_fa: string | null
           title_tg: string | null
           trailer_url: string | null
+          view_count: number
           year: number
         }
         Insert: {
@@ -303,6 +304,7 @@ export type Database = {
           title_fa?: string | null
           title_tg?: string | null
           trailer_url?: string | null
+          view_count?: number
           year?: number
         }
         Update: {
@@ -323,6 +325,7 @@ export type Database = {
           title_fa?: string | null
           title_tg?: string | null
           trailer_url?: string | null
+          view_count?: number
           year?: number
         }
         Relationships: []
@@ -596,7 +599,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_movie_views: { Args: { movie_id: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

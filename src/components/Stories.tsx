@@ -32,50 +32,57 @@ const FloatingHearts = ({ triggerCount }: { triggerCount: number }) => {
   const counterRef = useRef(0);
   const lastTrigger = useRef(0);
 
-  // Spawn burst of hearts when triggerCount changes
   useEffect(() => {
     if (triggerCount <= lastTrigger.current) return;
     lastTrigger.current = triggerCount;
     const burst: FloatingHeart[] = [];
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 8; i++) {
       burst.push({
         id: counterRef.current++,
-        x: 10 + Math.random() * 60,
-        size: 18 + Math.random() * 20,
-        duration: 1.8 + Math.random() * 1.2,
+        x: 20 + Math.random() * 50,
+        size: 16 + Math.random() * 24,
+        duration: 2.0 + Math.random() * 1.5,
         color: HEART_COLORS[Math.floor(Math.random() * HEART_COLORS.length)],
       });
     }
-    setHearts((prev) => [...prev.slice(-20), ...burst]);
+    setHearts((prev) => [...prev.slice(-30), ...burst]);
   }, [triggerCount]);
 
   return (
-    <div className="absolute bottom-20 right-0 w-28 h-[60%] pointer-events-none z-20 overflow-hidden">
+    <div className="absolute bottom-16 right-2 w-24 pointer-events-none z-20" style={{ height: "70%" }}>
       <AnimatePresence>
-        {hearts.map((h) => (
-          <motion.div
-            key={h.id}
-            initial={{ opacity: 1, y: 0, x: h.x, scale: 0.5 }}
-            animate={{
-              opacity: [1, 1, 0],
-              y: -400,
-              x: h.x + (Math.random() - 0.5) * 40,
-              scale: [0.5, 1.4, 0.8],
-              rotate: (Math.random() - 0.5) * 30,
-            }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: h.duration, ease: "easeOut" }}
-            onAnimationComplete={() =>
-              setHearts((prev) => prev.filter((p) => p.id !== h.id))
-            }
-            className="absolute bottom-0"
-          >
-            <Heart
-              className="fill-current"
-              style={{ color: h.color, width: h.size, height: h.size }}
-            />
-          </motion.div>
-        ))}
+        {hearts.map((h) => {
+          const sway = (Math.random() - 0.5) * 60;
+          return (
+            <motion.div
+              key={h.id}
+              initial={{ opacity: 0.9, bottom: 0, x: h.x, scale: 0.3 }}
+              animate={{
+                opacity: [0.9, 1, 1, 0],
+                bottom: "100%",
+                x: [h.x, h.x + sway * 0.5, h.x + sway, h.x + sway * 0.7],
+                scale: [0.3, 1.2, 1, 0.6],
+                rotate: [0, sway > 0 ? 15 : -15, 0],
+              }}
+              exit={{ opacity: 0 }}
+              transition={{
+                duration: h.duration,
+                ease: [0.25, 0.46, 0.45, 0.94],
+                opacity: { times: [0, 0.1, 0.7, 1] },
+              }}
+              onAnimationComplete={() =>
+                setHearts((prev) => prev.filter((p) => p.id !== h.id))
+              }
+              className="absolute"
+              style={{ position: "absolute" }}
+            >
+              <Heart
+                className="fill-current drop-shadow-lg"
+                style={{ color: h.color, width: h.size, height: h.size }}
+              />
+            </motion.div>
+          );
+        })}
       </AnimatePresence>
     </div>
   );
