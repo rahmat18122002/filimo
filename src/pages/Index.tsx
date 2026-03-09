@@ -150,6 +150,12 @@ const MovieCarousel = ({ movies, carouselSpeed, lang }: { movies: DBMovie[]; car
                   <Clock className="h-3 w-3" />
                   {movie.duration}
                 </span>
+                {movie.view_count > 0 && (
+                  <span className="flex items-center gap-1">
+                    <Eye className="h-3 w-3" />
+                    {movie.view_count >= 1000 ? `${(movie.view_count / 1000).toFixed(1)}K` : movie.view_count}
+                  </span>
+                )}
               </div>
             </div>
           </motion.div>
