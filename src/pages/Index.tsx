@@ -30,6 +30,12 @@ interface DBCategory {
   sort_order: number;
 }
 
+const formatViewCount = (count: number): string => {
+  if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
+  if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
+  return String(count);
+};
+
 const MovieCarousel = ({ movies, carouselSpeed, lang }: { movies: DBMovie[]; carouselSpeed: number; lang: Lang }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
