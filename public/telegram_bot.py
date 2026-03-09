@@ -288,6 +288,42 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         sb.table("bot_settings").update({"value": "true"}).eq("key", "copy_protection").execute()
         await query.message.edit_text("🔒 Защита от копирования *включена*.", parse_mode="Markdown")
 
+    # ─── Add episode: list movies ───
+    elif query.data == "admin_add_episode":
+        if not is_admin(user.id):
+            return
+        res = sb.table("movies").select("id, title, year").order("created_at", desc=True).limit(20).execute()
+        movies = res.data or []
+        if not movies:
+            await query.message.edit_text("❌ Нет фильмов в базе.")
+            return
+        buttons = [
+            [InlineKeyboardButton(f"🎬 {m['title']} ({m['year']})", callback_data=f"ep_movie_{m['id']}")]
+            for m in movies
+        ]
+        await query.message.edit_text("Выберите фильм для добавления эпизода:", reply_markup=InlineKeyboardMarkup(buttons))
+
+    elif query.data.startswith("ep_movie_"):
+        if not is_admin(user.id):
+            return
+        movie_id = query.data.replace("ep_movie_", "")
+        context.user_data["adding_episode_movie_id"] = movie_id
+        # Count existing episodes
+        ep_res = sb.table("episodes").select("id", count="exact").eq("movie_id", movie_id).execute()
+        ep_count = ep_res.count or 0
+        movie_res = sb.table("movies").select("title").eq("id", movie_id).single().execute()
+        movie_title = movie_res.data["title"] if movie_res.data else "—"
+        context.user_data["adding_episode_next_part"] = ep_count + 1
+        await query.message.edit_text(
+            f"🎬 *{movie_title}*\n"
+            f"📺 Частей сейчас: *{ep_count}*\n\n"
+            f"Отправьте ссылки на новые части — каждая ссылка на отдельной строке.\n"
+            f"Нумерация начнётся с *{ep_count + 1}*.\n\n"
+            f"Или отправьте в формате:\n`название | ссылка | длительность`\n"
+            f"(длительность необязательна)",
+            parse_mode="Markdown"
+        )
+
 
 # ─── Text handler (search + add channel) ─────────────────────
 
