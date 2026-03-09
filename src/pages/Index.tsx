@@ -131,7 +131,7 @@ const MovieCarousel = ({ movies, carouselSpeed, lang }: { movies: DBMovie[]; car
                 {getLocalizedField(movie, "title", lang)}
               </h3>
               <div className="mt-2 flex items-center justify-between">
-                <LiveViewCount baseCount={movie.view_count} />
+                <ViewCount count={movie.view_count} />
                 <button
                   onClick={async (e) => {
                     e.stopPropagation();
