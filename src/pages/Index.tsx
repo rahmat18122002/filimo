@@ -36,6 +36,40 @@ const formatViewCount = (count: number): string => {
   return String(count);
 };
 
+const LiveViewCount = ({ baseCount }: { baseCount: number }) => {
+  const [extra, setExtra] = useState(0);
+  const [showPlus, setShowPlus] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setExtra((prev) => prev + 10);
+      setShowPlus(true);
+      setTimeout(() => setShowPlus(false), 2000);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="flex items-center gap-1 text-xs text-muted-foreground relative">
+      <Eye className="h-3.5 w-3.5" />
+      <span className="font-medium">{formatViewCount(baseCount + extra)}</span>
+      <AnimatePresence>
+        {showPlus && (
+          <motion.span
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: -8 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 1.5 }}
+            className="absolute -top-1 left-8 text-[10px] font-bold text-primary"
+          >
+            +10
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 const MovieCarousel = ({ movies, carouselSpeed, lang }: { movies: DBMovie[]; carouselSpeed: number; lang: Lang }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -120,10 +154,11 @@ const MovieCarousel = ({ movies, carouselSpeed, lang }: { movies: DBMovie[]; car
               </div>
             </div>
             <div className="mt-3 px-1">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-1 group-hover:text-primary transition-colors flex-1">
-                  {getLocalizedField(movie, "title", lang)}
-                </h3>
+              <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-1 group-hover:text-primary transition-colors">
+                {getLocalizedField(movie, "title", lang)}
+              </h3>
+              <div className="mt-2 flex items-center justify-between">
+                <LiveViewCount baseCount={movie.view_count} />
                 <button
                   onClick={async (e) => {
                     e.stopPropagation();
@@ -144,22 +179,11 @@ const MovieCarousel = ({ movies, carouselSpeed, lang }: { movies: DBMovie[]; car
                       }
                     }
                   }}
-                  className="ml-2 shrink-0 rounded-full p-1 text-muted-foreground transition-colors hover:text-primary hover:bg-primary/10"
+                  className="shrink-0 rounded-full p-1.5 text-muted-foreground transition-colors hover:text-primary hover:bg-primary/10"
                   title="Поделиться"
                 >
-                  <Share2 className="h-3.5 w-3.5" />
+                  <Share2 className="h-4 w-4" />
                 </button>
-              </div>
-              <div className="mt-1.5 flex items-center gap-3 text-xs text-muted-foreground">
-                <span>{movie.year}</span>
-                <span className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  {movie.duration}
-                </span>
-              </div>
-              <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground/70">
-                <Eye className="h-3 w-3" />
-                <span>{formatViewCount(movie.view_count)}</span>
               </div>
             </div>
           </motion.div>
@@ -277,13 +301,9 @@ const Index = () => {
                   </div>
                   <div className="mt-3 px-1">
                     <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-1">{getLocalizedField(movie, "title", lang)}</h3>
-                    <div className="mt-1.5 flex items-center gap-3 text-xs text-muted-foreground">
-                      <span>{movie.year}</span>
-                      <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{movie.duration}</span>
-                    </div>
-                    <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground/70">
-                      <Eye className="h-3 w-3" />
-                      <span>{formatViewCount(movie.view_count)}</span>
+                    <div className="mt-2 flex items-center justify-between">
+                      <LiveViewCount baseCount={movie.view_count} />
+                      <Share2 className="h-4 w-4 text-muted-foreground" />
                     </div>
                   </div>
                 </motion.div>
