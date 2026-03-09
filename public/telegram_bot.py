@@ -331,6 +331,40 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     text = update.message.text.strip()
 
+    # Admin adding episodes
+    if is_admin(user.id) and context.user_data.get("adding_episode_movie_id"):
+        movie_id = context.user_data.pop("adding_episode_movie_id")
+        next_part = context.user_data.pop("adding_episode_next_part", 1)
+        lines = [l.strip() for l in text.split("\n") if l.strip()]
+        added = 0
+        for i, line in enumerate(lines):
+            parts = [p.strip() for p in line.split("|")]
+            if len(parts) >= 2:
+                title_ep = parts[0]
+                url = parts[1]
+                duration = parts[2] if len(parts) > 2 else None
+            else:
+                # Just a URL
+                url = parts[0]
+                title_ep = f"Часть {next_part + i}"
+                duration = None
+            ep_data = {
+                "movie_id": movie_id,
+                "part_number": next_part + i,
+                "title": title_ep,
+                "video_url": url,
+                "is_free": (next_part + i) <= 3,
+            }
+            if duration:
+                ep_data["duration"] = duration
+            try:
+                sb.table("episodes").insert(ep_data).execute()
+                added += 1
+            except Exception as e:
+                logger.error(f"Episode insert error: {e}")
+        await update.message.reply_text(f"✅ Добавлено {added} эпизод(ов)!")
+        return
+
     # Admin adding channel
     if is_admin(user.id) and context.user_data.get("adding_channel_type"):
         ch_type = context.user_data.pop("adding_channel_type")
