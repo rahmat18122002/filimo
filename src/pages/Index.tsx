@@ -305,7 +305,6 @@ const Index = () => {
                       <LiveViewCount baseCount={movie.view_count} />
                       <Share2 className="h-4 w-4 text-muted-foreground" />
                     </div>
-                    </div>
                   </div>
                 </motion.div>
               ))}
