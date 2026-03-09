@@ -307,16 +307,24 @@ const Stories = () => {
               {/* Floating hearts animation */}
               <FloatingHearts triggerCount={likeTrigger} />
 
-              {/* Like button */}
+              {/* Like button with count */}
               <motion.button
                 whileTap={{ scale: 1.4 }}
-                onClick={(e) => {
+                onClick={async (e) => {
                   e.stopPropagation();
                   setLikeTrigger((c) => c + 1);
+                  const storyId = stories[viewingIndex!].id;
+                  const deviceId = localStorage.getItem("device_id") || "unknown";
+                  // Save like to DB
+                  await supabase.from("story_likes").insert({ story_id: storyId, device_id: deviceId });
+                  setLikeCounts((prev) => ({ ...prev, [storyId]: (prev[storyId] || 0) + 1 }));
                 }}
-                className="absolute bottom-10 left-4 z-30 p-2 rounded-full bg-black/30 backdrop-blur-sm border border-white/20 hover:bg-black/50 transition-colors"
+                className="absolute bottom-10 left-4 z-30 flex items-center gap-2 p-2 rounded-full bg-black/30 backdrop-blur-sm border border-white/20 hover:bg-black/50 transition-colors"
               >
                 <Heart className="h-7 w-7 text-white fill-destructive" />
+                <span className="text-white text-sm font-bold pr-1">
+                  {likeCounts[stories[viewingIndex!].id] || 0}
+                </span>
               </motion.button>
 
               {/* Navigate left/right */}
