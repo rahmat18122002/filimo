@@ -89,6 +89,7 @@ const Stories = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const pausedRef = useRef(false);
   const viewedRef = useRef<Set<string>>(new Set());
+  const [likeTrigger, setLikeTrigger] = useState(0);
   const navigate = useNavigate();
 
   const fetchStories = () => {
