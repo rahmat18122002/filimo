@@ -27,28 +27,30 @@ interface FloatingHeart {
 
 const HEART_COLORS = ["#ff3040", "#ff6b81", "#ff4757", "#e84393", "#fd79a8"];
 
-const FloatingHearts = () => {
+const FloatingHearts = ({ triggerCount }: { triggerCount: number }) => {
   const [hearts, setHearts] = useState<FloatingHeart[]>([]);
   const counterRef = useRef(0);
+  const lastTrigger = useRef(0);
 
+  // Spawn burst of hearts when triggerCount changes
   useEffect(() => {
-    const interval = setInterval(() => {
-      const id = counterRef.current++;
-      const heart: FloatingHeart = {
-        id,
-        x: 10 + Math.random() * 50,
-        size: 16 + Math.random() * 18,
-        duration: 2 + Math.random() * 1.5,
+    if (triggerCount <= lastTrigger.current) return;
+    lastTrigger.current = triggerCount;
+    const burst: FloatingHeart[] = [];
+    for (let i = 0; i < 6; i++) {
+      burst.push({
+        id: counterRef.current++,
+        x: 10 + Math.random() * 60,
+        size: 18 + Math.random() * 20,
+        duration: 1.8 + Math.random() * 1.2,
         color: HEART_COLORS[Math.floor(Math.random() * HEART_COLORS.length)],
-      };
-      setHearts((prev) => [...prev.slice(-15), heart]);
-    }, 600 + Math.random() * 400);
-
-    return () => clearInterval(interval);
-  }, []);
+      });
+    }
+    setHearts((prev) => [...prev.slice(-20), ...burst]);
+  }, [triggerCount]);
 
   return (
-    <div className="absolute bottom-20 left-0 w-24 h-[60%] pointer-events-none z-20 overflow-hidden">
+    <div className="absolute bottom-20 right-0 w-28 h-[60%] pointer-events-none z-20 overflow-hidden">
       <AnimatePresence>
         {hearts.map((h) => (
           <motion.div
@@ -58,7 +60,7 @@ const FloatingHearts = () => {
               opacity: [1, 1, 0],
               y: -400,
               x: h.x + (Math.random() - 0.5) * 40,
-              scale: [0.5, 1.2, 0.8],
+              scale: [0.5, 1.4, 0.8],
               rotate: (Math.random() - 0.5) * 30,
             }}
             exit={{ opacity: 0 }}
