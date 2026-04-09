@@ -375,6 +375,245 @@ export type Database = {
           },
         ]
       }
+      shop_cart_items: {
+        Row: {
+          created_at: string
+          device_id: string
+          id: string
+          product_id: string
+          quantity: number
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          id?: string
+          product_id: string
+          quantity?: number
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          id?: string
+          product_id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_cart_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "shop_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_categories: {
+        Row: {
+          created_at: string
+          icon: string
+          id: string
+          is_active: boolean
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      shop_order_items: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string
+          price: number
+          product_id: string
+          product_title: string
+          quantity: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id: string
+          price?: number
+          product_id: string
+          product_title: string
+          quantity?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+          price?: number
+          product_id?: string
+          product_title?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "shop_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "shop_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_orders: {
+        Row: {
+          created_at: string
+          customer_address: string
+          customer_name: string
+          customer_phone: string
+          device_id: string
+          id: string
+          payment_method: string
+          reviewed_at: string | null
+          screenshot_url: string | null
+          status: string
+          total_amount: number
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_address?: string
+          customer_name: string
+          customer_phone: string
+          device_id: string
+          id?: string
+          payment_method?: string
+          reviewed_at?: string | null
+          screenshot_url?: string | null
+          status?: string
+          total_amount?: number
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_address?: string
+          customer_name?: string
+          customer_phone?: string
+          device_id?: string
+          id?: string
+          payment_method?: string
+          reviewed_at?: string | null
+          screenshot_url?: string | null
+          status?: string
+          total_amount?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_orders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_product_images: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          product_id: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          product_id: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          product_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_product_images_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "shop_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_products: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          description: string
+          id: string
+          image_url: string
+          in_stock: boolean
+          is_active: boolean
+          price: number
+          sort_order: number
+          title: string
+          view_count: number
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string
+          in_stock?: boolean
+          is_active?: boolean
+          price?: number
+          sort_order?: number
+          title: string
+          view_count?: number
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string
+          in_stock?: boolean
+          is_active?: boolean
+          price?: number
+          sort_order?: number
+          title?: string
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "shop_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       slider_items: {
         Row: {
           created_at: string

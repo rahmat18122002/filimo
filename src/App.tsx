@@ -9,6 +9,11 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import MovieDetail from "./pages/MovieDetail";
 import VipPurchase from "./pages/VipPurchase";
+import Shop from "./pages/Shop";
+import ShopProductDetail from "./pages/ShopProductDetail";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import OrderHistory from "./pages/OrderHistory";
 import LiveTV from "./pages/LiveTV";
 import AdminLogin from "./pages/AdminLogin";
 import AdminGuard from "./components/AdminGuard";
@@ -24,6 +29,8 @@ import SettingsAdmin from "./pages/admin/SettingsAdmin";
 import CategoriesAdmin from "./pages/admin/CategoriesAdmin";
 import LiveChannelsAdmin from "./pages/admin/LiveChannelsAdmin";
 import StoriesAdmin from "./pages/admin/StoriesAdmin";
+import ShopProductsAdmin from "./pages/admin/ShopProductsAdmin";
+import ShopOrdersAdmin from "./pages/admin/ShopOrdersAdmin";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +47,11 @@ const App = () => (
           <Route path="/movie/:id" element={<MovieDetail />} />
           <Route path="/vip" element={<VipPurchase />} />
           <Route path="/live" element={<LiveTV />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/shop/:id" element={<ShopProductDetail />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/orders" element={<OrderHistory />} />
           <Route path="/gate" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminGuard><AdminLayout /></AdminGuard>}>
             <Route index element={<Dashboard />} />
@@ -52,6 +64,8 @@ const App = () => (
             <Route path="slider" element={<SliderAdmin />} />
             <Route path="live-channels" element={<LiveChannelsAdmin />} />
             <Route path="stories" element={<StoriesAdmin />} />
+            <Route path="shop-products" element={<ShopProductsAdmin />} />
+            <Route path="shop-orders" element={<ShopOrdersAdmin />} />
             <Route path="settings" element={<SettingsAdmin />} />
             
           </Route>

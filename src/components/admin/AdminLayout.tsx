@@ -14,6 +14,8 @@ import {
   Tag,
   Satellite,
   BookOpen,
+  ShoppingBag,
+  ClipboardList,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -29,6 +31,8 @@ const navItems = [
   { to: "/admin/slider", icon: ImageIcon, label: "Слайдер" },
   { to: "/admin/live-channels", icon: Satellite, label: "🛰️ Live TV" },
   { to: "/admin/stories", icon: BookOpen, label: "📖 Stories" },
+  { to: "/admin/shop-products", icon: ShoppingBag, label: "🛍️ Товары" },
+  { to: "/admin/shop-orders", icon: ClipboardList, label: "📦 Заказы" },
   { to: "/admin/settings", icon: Settings, label: "Настройки" },
 ];
 
