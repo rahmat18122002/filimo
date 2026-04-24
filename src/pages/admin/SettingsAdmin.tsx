@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Settings, Save, Bot } from "lucide-react";
+import { Settings, Save, Bot, Phone } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,8 +11,11 @@ const SettingsAdmin = () => {
   const [appName, setAppName] = useState("");
   const [botToken, setBotToken] = useState("");
   const [botUsername, setBotUsername] = useState("");
+  const [shopPhone, setShopPhone] = useState("");
+  const [shopWhatsapp, setShopWhatsapp] = useState("");
   const [saving, setSaving] = useState(false);
   const [savingBot, setSavingBot] = useState(false);
+  const [savingShop, setSavingShop] = useState(false);
 
   useEffect(() => {
     // Load all settings in parallel
