@@ -20,7 +20,7 @@ const SettingsAdmin = () => {
   useEffect(() => {
     // Load all settings in parallel
     const loadSettings = async () => {
-      const keys = ["app_name", "bot_token", "bot_username"];
+      const keys = ["app_name", "bot_token", "bot_username", "shop_phone", "shop_whatsapp"];
       const { data } = await supabase
         .from("bot_settings")
         .select("key, value")
@@ -38,6 +38,8 @@ const SettingsAdmin = () => {
         for (const row of data) {
           if (row.key === "bot_token") setBotToken(row.value);
           if (row.key === "bot_username") setBotUsername(row.value);
+          if (row.key === "shop_phone") setShopPhone(row.value);
+          if (row.key === "shop_whatsapp") setShopWhatsapp(row.value);
         }
       }
     };
