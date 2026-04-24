@@ -47,7 +47,7 @@ const HeroSlider = () => {
   const item = items[current];
 
   return (
-    <section className="relative w-full overflow-hidden bg-background" style={{ aspectRatio: "16 / 9" }}>
+    <section className="relative w-full overflow-hidden rounded-2xl bg-background" style={{ aspectRatio: "16 / 9" }}>
       <AnimatePresence mode="wait">
         <motion.img
           key={item.id}
