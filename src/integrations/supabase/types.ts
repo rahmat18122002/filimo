@@ -490,6 +490,7 @@ export type Database = {
           payment_method: string
           reviewed_at: string | null
           screenshot_url: string | null
+          seller_id: string | null
           status: string
           total_amount: number
           user_id: string | null
@@ -504,6 +505,7 @@ export type Database = {
           payment_method?: string
           reviewed_at?: string | null
           screenshot_url?: string | null
+          seller_id?: string | null
           status?: string
           total_amount?: number
           user_id?: string | null
@@ -518,6 +520,7 @@ export type Database = {
           payment_method?: string
           reviewed_at?: string | null
           screenshot_url?: string | null
+          seller_id?: string | null
           status?: string
           total_amount?: number
           user_id?: string | null
@@ -574,6 +577,7 @@ export type Database = {
           in_stock: boolean
           is_active: boolean
           price: number
+          seller_id: string | null
           sort_order: number
           title: string
           view_count: number
@@ -587,6 +591,7 @@ export type Database = {
           in_stock?: boolean
           is_active?: boolean
           price?: number
+          seller_id?: string | null
           sort_order?: number
           title: string
           view_count?: number
@@ -600,6 +605,7 @@ export type Database = {
           in_stock?: boolean
           is_active?: boolean
           price?: number
+          seller_id?: string | null
           sort_order?: number
           title?: string
           view_count?: number
@@ -613,6 +619,108 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      shop_seller_plans: {
+        Row: {
+          created_at: string
+          days: number
+          id: string
+          is_active: boolean
+          label: string
+          price: number
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          days?: number
+          id?: string
+          is_active?: boolean
+          label: string
+          price?: number
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          days?: number
+          id?: string
+          is_active?: boolean
+          label?: string
+          price?: number
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      shop_seller_subscriptions: {
+        Row: {
+          created_at: string
+          id: string
+          plan_id: string
+          reviewed_at: string | null
+          screenshot_url: string
+          seller_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          plan_id: string
+          reviewed_at?: string | null
+          screenshot_url: string
+          seller_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          plan_id?: string
+          reviewed_at?: string | null
+          screenshot_url?: string
+          seller_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      shop_sellers: {
+        Row: {
+          created_at: string
+          description: string
+          device_id: string
+          id: string
+          is_active: boolean
+          logo_url: string
+          phone: string
+          shop_name: string
+          subscription_until: string | null
+          updated_at: string
+          whatsapp: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          device_id: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string
+          phone?: string
+          shop_name: string
+          subscription_until?: string | null
+          updated_at?: string
+          whatsapp?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          device_id?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string
+          phone?: string
+          shop_name?: string
+          subscription_until?: string | null
+          updated_at?: string
+          whatsapp?: string
+        }
+        Relationships: []
       }
       slider_items: {
         Row: {
