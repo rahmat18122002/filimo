@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Search, SlidersHorizontal, ShoppingCart, X, ChevronDown } from "lucide-react";
+import { ShoppingBag, Search, SlidersHorizontal, ShoppingCart, X, ChevronDown, Home, Phone, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
