@@ -31,6 +31,10 @@ import LiveChannelsAdmin from "./pages/admin/LiveChannelsAdmin";
 import StoriesAdmin from "./pages/admin/StoriesAdmin";
 import ShopProductsAdmin from "./pages/admin/ShopProductsAdmin";
 import ShopOrdersAdmin from "./pages/admin/ShopOrdersAdmin";
+import SellersAdmin from "./pages/admin/SellersAdmin";
+import SellerOnboarding from "./pages/SellerOnboarding";
+import SellerDashboard from "./pages/SellerDashboard";
+import SellerStorefront from "./pages/SellerStorefront";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +56,9 @@ const App = () => (
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/orders" element={<OrderHistory />} />
+          <Route path="/seller" element={<SellerOnboarding />} />
+          <Route path="/seller/dashboard" element={<SellerDashboard />} />
+          <Route path="/seller/:id" element={<SellerStorefront />} />
           <Route path="/gate" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminGuard><AdminLayout /></AdminGuard>}>
             <Route index element={<Dashboard />} />
@@ -66,6 +73,7 @@ const App = () => (
             <Route path="stories" element={<StoriesAdmin />} />
             <Route path="shop-products" element={<ShopProductsAdmin />} />
             <Route path="shop-orders" element={<ShopOrdersAdmin />} />
+            <Route path="sellers" element={<SellersAdmin />} />
             <Route path="settings" element={<SettingsAdmin />} />
             
           </Route>
