@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Search, SlidersHorizontal, ShoppingCart, X, ChevronDown } from "lucide-react";
+import { ShoppingBag, Search, SlidersHorizontal, ShoppingCart, X, ChevronDown, Home, Phone, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
@@ -38,6 +38,8 @@ const Shop = () => {
   const [sortBy, setSortBy] = useState<SortOption>("popular");
   const [showFilters, setShowFilters] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [shopPhone, setShopPhone] = useState("");
+  const [shopWhatsapp, setShopWhatsapp] = useState("");
 
   useEffect(() => {
     supabase.from("shop_products").select("*").eq("is_active", true).then(({ data }) => {
@@ -45,6 +47,14 @@ const Shop = () => {
     });
     supabase.from("shop_categories").select("*").eq("is_active", true).order("sort_order").then(({ data }) => {
       if (data) setCategories(data as ShopCategory[]);
+    });
+    supabase.from("bot_settings").select("key, value").in("key", ["shop_phone", "shop_whatsapp"]).then(({ data }) => {
+      if (data) {
+        for (const row of data) {
+          if (row.key === "shop_phone") setShopPhone(row.value);
+          if (row.key === "shop_whatsapp") setShopWhatsapp(row.value);
+        }
+      }
     });
     // Cart count
     const deviceId = localStorage.getItem("kino_device_id");
@@ -79,9 +89,12 @@ const Shop = () => {
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
       <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur-md">
-        <div className="container mx-auto flex items-center gap-3 px-4 py-3">
-          <ShoppingBag className="h-6 w-6 text-primary shrink-0" />
-          <h1 className="text-lg font-bold text-foreground">Магазин</h1>
+        <div className="container mx-auto flex items-center gap-2 px-4 py-3">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/home")} title="Главное меню">
+            <Home className="h-5 w-5" />
+          </Button>
+          <ShoppingBag className="h-5 w-5 text-primary shrink-0" />
+          <h1 className="text-base font-bold text-foreground">Магазин</h1>
           <div className="flex-1" />
           <Button variant="ghost" size="icon" className="relative" onClick={() => navigate("/cart")}>
             <ShoppingCart className="h-5 w-5" />
@@ -184,6 +197,32 @@ const Shop = () => {
           </div>
         )}
       </div>
+
+      {/* Floating contact buttons */}
+      {(shopPhone || shopWhatsapp) && (
+        <div className="fixed bottom-6 right-4 z-40 flex flex-col gap-3">
+          {shopWhatsapp && (
+            <a
+              href={`https://wa.me/${shopWhatsapp.replace(/\D/g, "")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-[hsl(142_70%_45%)] text-white shadow-lg transition-transform hover:scale-110 active:scale-95"
+              title="WhatsApp"
+            >
+              <MessageCircle className="h-5 w-5" />
+            </a>
+          )}
+          {shopPhone && (
+            <a
+              href={`tel:${shopPhone.replace(/\s/g, "")}`}
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-110 active:scale-95"
+              title="Позвонить"
+            >
+              <Phone className="h-5 w-5" />
+            </a>
+          )}
+        </div>
+      )}
     </div>
   );
 };

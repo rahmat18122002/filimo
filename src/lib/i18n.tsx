@@ -212,8 +212,6 @@ export const getLocalizedField = (
 };
 
 export const LANGUAGES: { code: Lang; label: string; flag: string }[] = [
-  { code: "en", label: "English", flag: "🇬🇧" },
   { code: "ru", label: "Русский", flag: "🇷🇺" },
-  { code: "tg", label: "Тоҷикӣ", flag: "🇹🇯" },
-  { code: "fa", label: "فارسی", flag: "🇮🇷" },
+  { code: "en", label: "English", flag: "🇬🇧" },
 ];

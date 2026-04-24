@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Settings, Save, Bot } from "lucide-react";
+import { Settings, Save, Bot, Phone } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,13 +11,16 @@ const SettingsAdmin = () => {
   const [appName, setAppName] = useState("");
   const [botToken, setBotToken] = useState("");
   const [botUsername, setBotUsername] = useState("");
+  const [shopPhone, setShopPhone] = useState("");
+  const [shopWhatsapp, setShopWhatsapp] = useState("");
   const [saving, setSaving] = useState(false);
   const [savingBot, setSavingBot] = useState(false);
+  const [savingShop, setSavingShop] = useState(false);
 
   useEffect(() => {
     // Load all settings in parallel
     const loadSettings = async () => {
-      const keys = ["app_name", "bot_token", "bot_username"];
+      const keys = ["app_name", "bot_token", "bot_username", "shop_phone", "shop_whatsapp"];
       const { data } = await supabase
         .from("bot_settings")
         .select("key, value")
@@ -35,6 +38,8 @@ const SettingsAdmin = () => {
         for (const row of data) {
           if (row.key === "bot_token") setBotToken(row.value);
           if (row.key === "bot_username") setBotUsername(row.value);
+          if (row.key === "shop_phone") setShopPhone(row.value);
+          if (row.key === "shop_whatsapp") setShopWhatsapp(row.value);
         }
       }
     };
@@ -76,6 +81,29 @@ const SettingsAdmin = () => {
       toast({ title: "Ошибка сохранения", variant: "destructive" });
     }
     setSavingBot(false);
+  };
+
+  const saveShop = async () => {
+    setSavingShop(true);
+    try {
+      for (const [key, value] of [["shop_phone", shopPhone.trim()], ["shop_whatsapp", shopWhatsapp.trim()]]) {
+        const { data: existing } = await supabase
+          .from("bot_settings")
+          .select("id")
+          .eq("key", key)
+          .maybeSingle();
+
+        if (existing) {
+          await supabase.from("bot_settings").update({ value }).eq("key", key);
+        } else {
+          await supabase.from("bot_settings").insert({ key, value });
+        }
+      }
+      toast({ title: "Контакты магазина сохранены" });
+    } catch {
+      toast({ title: "Ошибка сохранения", variant: "destructive" });
+    }
+    setSavingShop(false);
   };
 
   return (
@@ -134,6 +162,37 @@ const SettingsAdmin = () => {
           <Button onClick={saveBot} disabled={savingBot} className="gap-2">
             <Save className="h-4 w-4" />
             {savingBot ? "Сохранение..." : "Сохранить настройки бота"}
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-gradient-card border-border">
+        <CardContent className="p-5 space-y-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Phone className="h-5 w-5 text-muted-foreground" />
+            <p className="text-sm font-medium text-foreground">Контакты магазина</p>
+          </div>
+          <div>
+            <Label className="text-xs text-muted-foreground">Номер для звонков</Label>
+            <Input
+              value={shopPhone}
+              onChange={(e) => setShopPhone(e.target.value)}
+              placeholder="+992 900 00 00 00"
+              className="bg-secondary border-border mt-1"
+            />
+          </div>
+          <div>
+            <Label className="text-xs text-muted-foreground">Номер WhatsApp (с кодом страны, без +)</Label>
+            <Input
+              value={shopWhatsapp}
+              onChange={(e) => setShopWhatsapp(e.target.value)}
+              placeholder="992900000000"
+              className="bg-secondary border-border mt-1"
+            />
+          </div>
+          <Button onClick={saveShop} disabled={savingShop} className="gap-2">
+            <Save className="h-4 w-4" />
+            {savingShop ? "Сохранение..." : "Сохранить контакты"}
           </Button>
         </CardContent>
       </Card>
