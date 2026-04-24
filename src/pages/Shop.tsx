@@ -89,9 +89,12 @@ const Shop = () => {
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
       <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur-md">
-        <div className="container mx-auto flex items-center gap-3 px-4 py-3">
-          <ShoppingBag className="h-6 w-6 text-primary shrink-0" />
-          <h1 className="text-lg font-bold text-foreground">Магазин</h1>
+        <div className="container mx-auto flex items-center gap-2 px-4 py-3">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/home")} title="Главное меню">
+            <Home className="h-5 w-5" />
+          </Button>
+          <ShoppingBag className="h-5 w-5 text-primary shrink-0" />
+          <h1 className="text-base font-bold text-foreground">Магазин</h1>
           <div className="flex-1" />
           <Button variant="ghost" size="icon" className="relative" onClick={() => navigate("/cart")}>
             <ShoppingCart className="h-5 w-5" />
