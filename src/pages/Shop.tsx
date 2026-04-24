@@ -129,6 +129,24 @@ const Shop = () => {
       </header>
 
       <div className="container mx-auto px-4 py-4 space-y-4">
+        {/* Become seller CTA */}
+        <button
+          onClick={() => navigate(mySellerStatus === "active" ? "/seller/dashboard" : "/seller")}
+          className="flex w-full items-center gap-3 rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 to-accent/10 p-3 text-left transition-colors hover:from-primary/15 hover:to-accent/15"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/20">
+            <Store className="h-5 w-5 text-primary" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-bold text-foreground">
+              {mySellerStatus === "active" ? "Открыть мой магазин" : mySellerStatus === "pending" ? "Заявка на проверке" : "Стать продавцом"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {mySellerStatus === "active" ? "Управление товарами и заказами" : "Открой свой магазин в приложении"}
+            </p>
+          </div>
+        </button>
+
         {/* Search */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -205,6 +223,15 @@ const Shop = () => {
               </div>
               <div className="mt-2 px-1">
                 <h3 className="text-sm font-medium text-foreground line-clamp-2">{product.title}</h3>
+                {product.seller_id && sellersMap[product.seller_id] && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); navigate(`/seller/${product.seller_id}`); }}
+                    className="mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground hover:text-primary"
+                  >
+                    <Store className="h-3 w-3" />
+                    <span className="truncate">{sellersMap[product.seller_id].shop_name}</span>
+                  </button>
+                )}
                 <p className="mt-1 text-sm font-bold text-primary">{product.price} сом.</p>
               </div>
             </motion.div>
