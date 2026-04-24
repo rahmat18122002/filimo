@@ -16,6 +16,7 @@ import {
   BookOpen,
   ShoppingBag,
   ClipboardList,
+  Store,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ const navItems = [
   { to: "/admin/stories", icon: BookOpen, label: "📖 Stories" },
   { to: "/admin/shop-products", icon: ShoppingBag, label: "🛍️ Товары" },
   { to: "/admin/shop-orders", icon: ClipboardList, label: "📦 Заказы" },
+  { to: "/admin/sellers", icon: Store, label: "🏪 Продавцы" },
   { to: "/admin/settings", icon: Settings, label: "Настройки" },
 ];
 

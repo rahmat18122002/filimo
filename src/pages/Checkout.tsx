@@ -65,26 +65,45 @@ const Checkout = () => {
     setSubmitting(true);
     try {
       const user = await getCurrentUser();
-      const { data: order, error } = await supabase.from("shop_orders").insert({
-        device_id: deviceId,
-        user_id: user?.id || null,
-        customer_name: name.trim(),
-        customer_phone: phone.trim(),
-        customer_address: address.trim(),
-        screenshot_url: screenshotUrl || null,
-        total_amount: total,
-      }).select().single();
-      if (error) throw error;
 
-      // Insert order items
-      const orderItems = cartItems.map((ci: any) => ({
-        order_id: (order as any).id,
-        product_id: ci.product.id,
-        product_title: ci.product.title,
-        quantity: ci.quantity,
-        price: ci.product.price,
-      }));
-      await supabase.from("shop_order_items").insert(orderItems);
+      // Get seller_id for each product to split orders by seller
+      const productIds = cartItems.map((ci: any) => ci.product.id);
+      const { data: prodInfo } = await supabase.from("shop_products").select("id, seller_id").in("id", productIds);
+      const sellerByProduct: Record<string, string | null> = {};
+      (prodInfo || []).forEach((p: any) => { sellerByProduct[p.id] = p.seller_id || null; });
+
+      // Group cart items by seller
+      const groups: Record<string, any[]> = {};
+      cartItems.forEach((ci: any) => {
+        const sid = sellerByProduct[ci.product.id] || "platform";
+        if (!groups[sid]) groups[sid] = [];
+        groups[sid].push(ci);
+      });
+
+      for (const sid of Object.keys(groups)) {
+        const items = groups[sid];
+        const orderTotal = items.reduce((s: number, i: any) => s + i.product.price * i.quantity, 0);
+        const { data: order, error } = await supabase.from("shop_orders").insert({
+          device_id: deviceId,
+          user_id: user?.id || null,
+          customer_name: name.trim(),
+          customer_phone: phone.trim(),
+          customer_address: address.trim(),
+          screenshot_url: screenshotUrl || null,
+          total_amount: orderTotal,
+          seller_id: sid === "platform" ? null : sid,
+        }).select().single();
+        if (error) throw error;
+
+        const orderItems = items.map((ci: any) => ({
+          order_id: (order as any).id,
+          product_id: ci.product.id,
+          product_title: ci.product.title,
+          quantity: ci.quantity,
+          price: ci.product.price,
+        }));
+        await supabase.from("shop_order_items").insert(orderItems);
+      }
 
       // Clear cart
       await supabase.from("shop_cart_items").delete().eq("device_id", deviceId);
