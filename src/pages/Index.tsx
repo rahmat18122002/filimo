@@ -237,7 +237,11 @@ const Index = () => {
         </div>
       </header>
 
-      <HeroSlider />
+      <div className="px-3 sm:px-6 pt-3 sm:pt-5">
+        <div className="relative overflow-hidden rounded-2xl border border-border/50 shadow-glow ring-1 ring-primary/20">
+          <HeroSlider />
+        </div>
+      </div>
 
       {/* Catalog Section */}
       <main id="catalog" className="container mx-auto px-6 py-12">
