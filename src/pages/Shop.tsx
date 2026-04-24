@@ -38,6 +38,8 @@ const Shop = () => {
   const [sortBy, setSortBy] = useState<SortOption>("popular");
   const [showFilters, setShowFilters] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [shopPhone, setShopPhone] = useState("");
+  const [shopWhatsapp, setShopWhatsapp] = useState("");
 
   useEffect(() => {
     supabase.from("shop_products").select("*").eq("is_active", true).then(({ data }) => {
@@ -45,6 +47,14 @@ const Shop = () => {
     });
     supabase.from("shop_categories").select("*").eq("is_active", true).order("sort_order").then(({ data }) => {
       if (data) setCategories(data as ShopCategory[]);
+    });
+    supabase.from("bot_settings").select("key, value").in("key", ["shop_phone", "shop_whatsapp"]).then(({ data }) => {
+      if (data) {
+        for (const row of data) {
+          if (row.key === "shop_phone") setShopPhone(row.value);
+          if (row.key === "shop_whatsapp") setShopWhatsapp(row.value);
+        }
+      }
     });
     // Cart count
     const deviceId = localStorage.getItem("kino_device_id");
