@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Search, SlidersHorizontal, ShoppingCart, X, ChevronDown, Home, Phone, MessageCircle } from "lucide-react";
+import { ShoppingBag, Search, SlidersHorizontal, ShoppingCart, X, ChevronDown, Home, Phone, MessageCircle, Store } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ interface ShopProduct {
   category_id: string | null;
   view_count: number;
   created_at: string;
+  seller_id: string | null;
 }
 
 interface ShopCategory {
@@ -24,6 +25,11 @@ interface ShopCategory {
   name: string;
   icon: string;
   sort_order: number;
+}
+
+interface SellerInfo {
+  id: string;
+  shop_name: string;
 }
 
 type SortOption = "popular" | "cheap" | "expensive" | "new";
@@ -40,11 +46,45 @@ const Shop = () => {
   const [cartCount, setCartCount] = useState(0);
   const [shopPhone, setShopPhone] = useState("");
   const [shopWhatsapp, setShopWhatsapp] = useState("");
+  const [sellersMap, setSellersMap] = useState<Record<string, SellerInfo>>({});
+  const [mySellerStatus, setMySellerStatus] = useState<"none" | "pending" | "active">("none");
 
   useEffect(() => {
     supabase.from("shop_products").select("*").eq("is_active", true).then(({ data }) => {
       if (data) setProducts(data as ShopProduct[]);
     });
+    supabase.from("shop_categories").select("*").eq("is_active", true).order("sort_order").then(({ data }) => {
+      if (data) setCategories(data as ShopCategory[]);
+    });
+    supabase.from("shop_sellers").select("id, shop_name").then(({ data }) => {
+      if (data) {
+        const map: Record<string, SellerInfo> = {};
+        (data as any[]).forEach(s => { map[s.id] = s; });
+        setSellersMap(map);
+      }
+    });
+    supabase.from("bot_settings").select("key, value").in("key", ["shop_phone", "shop_whatsapp"]).then(({ data }) => {
+      if (data) {
+        for (const row of data) {
+          if (row.key === "shop_phone") setShopPhone(row.value);
+          if (row.key === "shop_whatsapp") setShopWhatsapp(row.value);
+        }
+      }
+    });
+    // Cart count + seller status for current device
+    const deviceId = localStorage.getItem("kino_device_id");
+    if (deviceId) {
+      supabase.from("shop_cart_items").select("quantity").eq("device_id", deviceId).then(({ data }) => {
+        if (data) setCartCount(data.reduce((s, i) => s + (i as any).quantity, 0));
+      });
+      supabase.from("shop_sellers").select("is_active, subscription_until").eq("device_id", deviceId).maybeSingle().then(({ data }) => {
+        if (data) {
+          const active = (data as any).is_active && (data as any).subscription_until && new Date((data as any).subscription_until) > new Date();
+          setMySellerStatus(active ? "active" : "pending");
+        }
+      });
+    }
+  }, []);
     supabase.from("shop_categories").select("*").eq("is_active", true).order("sort_order").then(({ data }) => {
       if (data) setCategories(data as ShopCategory[]);
     });
