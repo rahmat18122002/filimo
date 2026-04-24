@@ -63,8 +63,8 @@ const HeroSlider = () => {
       <div className="absolute inset-0 bg-gradient-hero-overlay" />
       <div className="absolute inset-0 bg-background/40" />
 
-      <div className="relative z-10 flex h-full items-end pb-16">
-        <div className="container mx-auto px-6">
+      <div className="relative z-10 flex h-full items-end pb-6 sm:pb-10 md:pb-16">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.div
             key={item.id + "-text"}
             initial={{ opacity: 0, y: 30 }}
@@ -72,16 +72,16 @@ const HeroSlider = () => {
             transition={{ duration: 0.6 }}
             className="max-w-2xl"
           >
-            <div className="mb-4 flex items-center gap-3">
-              <span className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
+            <div className="mb-2 sm:mb-4 flex items-center gap-3">
+              <span className="rounded-full bg-primary px-2.5 py-0.5 text-[10px] sm:text-xs font-semibold text-primary-foreground">
                 Популярное
               </span>
             </div>
-            <h1 className="mb-4 text-5xl font-bold leading-tight text-foreground md:text-6xl">
+            <h1 className="mb-2 sm:mb-4 text-xl sm:text-3xl md:text-5xl lg:text-6xl font-bold leading-tight text-foreground line-clamp-2">
               {item.title}
             </h1>
             {item.subtitle && (
-              <p className="mb-8 max-w-lg text-lg text-muted-foreground leading-relaxed line-clamp-3">
+              <p className="mb-3 sm:mb-6 max-w-lg text-xs sm:text-sm md:text-lg text-muted-foreground leading-relaxed line-clamp-2 sm:line-clamp-3">
                 {item.subtitle}
               </p>
             )}
@@ -90,9 +90,9 @@ const HeroSlider = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate(`/movie/${item.movie_id}`)}
-                className="flex items-center gap-2 rounded-lg bg-primary px-8 py-3.5 font-semibold text-primary-foreground shadow-glow transition-colors hover:bg-primary/90"
+                className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 sm:px-8 sm:py-3.5 text-sm sm:text-base font-semibold text-primary-foreground shadow-glow transition-colors hover:bg-primary/90"
               >
-                <Play className="h-5 w-5 fill-primary-foreground" />
+                <Play className="h-4 w-4 sm:h-5 sm:w-5 fill-primary-foreground" />
                 Смотреть
               </motion.button>
             )}
