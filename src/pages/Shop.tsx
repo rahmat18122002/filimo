@@ -85,25 +85,6 @@ const Shop = () => {
       });
     }
   }, []);
-    supabase.from("shop_categories").select("*").eq("is_active", true).order("sort_order").then(({ data }) => {
-      if (data) setCategories(data as ShopCategory[]);
-    });
-    supabase.from("bot_settings").select("key, value").in("key", ["shop_phone", "shop_whatsapp"]).then(({ data }) => {
-      if (data) {
-        for (const row of data) {
-          if (row.key === "shop_phone") setShopPhone(row.value);
-          if (row.key === "shop_whatsapp") setShopWhatsapp(row.value);
-        }
-      }
-    });
-    // Cart count
-    const deviceId = localStorage.getItem("kino_device_id");
-    if (deviceId) {
-      supabase.from("shop_cart_items").select("quantity").eq("device_id", deviceId).then(({ data }) => {
-        if (data) setCartCount(data.reduce((s, i) => s + (i as any).quantity, 0));
-      });
-    }
-  }, []);
 
   const filtered = useMemo(() => {
     let result = [...products];
