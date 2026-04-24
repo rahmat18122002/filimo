@@ -165,6 +165,37 @@ const SettingsAdmin = () => {
           </Button>
         </CardContent>
       </Card>
+
+      <Card className="bg-gradient-card border-border">
+        <CardContent className="p-5 space-y-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Phone className="h-5 w-5 text-muted-foreground" />
+            <p className="text-sm font-medium text-foreground">Контакты магазина</p>
+          </div>
+          <div>
+            <Label className="text-xs text-muted-foreground">Номер для звонков</Label>
+            <Input
+              value={shopPhone}
+              onChange={(e) => setShopPhone(e.target.value)}
+              placeholder="+992 900 00 00 00"
+              className="bg-secondary border-border mt-1"
+            />
+          </div>
+          <div>
+            <Label className="text-xs text-muted-foreground">Номер WhatsApp (с кодом страны, без +)</Label>
+            <Input
+              value={shopWhatsapp}
+              onChange={(e) => setShopWhatsapp(e.target.value)}
+              placeholder="992900000000"
+              className="bg-secondary border-border mt-1"
+            />
+          </div>
+          <Button onClick={saveShop} disabled={savingShop} className="gap-2">
+            <Save className="h-4 w-4" />
+            {savingShop ? "Сохранение..." : "Сохранить контакты"}
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };
