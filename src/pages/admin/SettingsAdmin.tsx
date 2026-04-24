@@ -83,6 +83,29 @@ const SettingsAdmin = () => {
     setSavingBot(false);
   };
 
+  const saveShop = async () => {
+    setSavingShop(true);
+    try {
+      for (const [key, value] of [["shop_phone", shopPhone.trim()], ["shop_whatsapp", shopWhatsapp.trim()]]) {
+        const { data: existing } = await supabase
+          .from("bot_settings")
+          .select("id")
+          .eq("key", key)
+          .maybeSingle();
+
+        if (existing) {
+          await supabase.from("bot_settings").update({ value }).eq("key", key);
+        } else {
+          await supabase.from("bot_settings").insert({ key, value });
+        }
+      }
+      toast({ title: "Контакты магазина сохранены" });
+    } catch {
+      toast({ title: "Ошибка сохранения", variant: "destructive" });
+    }
+    setSavingShop(false);
+  };
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>
