@@ -1,1 +1,7 @@
 project_id = "mxqkxcbqinmlobopxuin"
+
+[functions.send-push]
+verify_jwt = false
+
+[functions.sync-sputnik-channels]
+verify_jwt = false

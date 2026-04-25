@@ -1,8 +1,7 @@
-// Minimal service worker so the app is installable as a PWA.
-// We avoid aggressive caching to keep React app updates instant.
-const CACHE_NAME = "kino-park-v1";
+// Service worker: PWA install + Web Push notifications.
+const CACHE_NAME = "kino-park-v2";
 
-self.addEventListener("install", (event) => {
+self.addEventListener("install", () => {
   self.skipWaiting();
 });
 
@@ -10,7 +9,7 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-// Network-first for navigation, falls back to cached index when offline.
+// Network-first navigation
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
@@ -25,4 +24,44 @@ self.addEventListener("fetch", (event) => {
         .catch(() => caches.match("/"))
     );
   }
+});
+
+// Receive push from server and show notification with sound/vibration
+self.addEventListener("push", (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch (e) {
+    data = { title: "Filimo", body: event.data ? event.data.text() : "" };
+  }
+  const title = data.title || "Filimo";
+  const options = {
+    body: data.body || "",
+    icon: data.poster || "/icon-192.png",
+    badge: "/icon-192.png",
+    image: data.poster || undefined,
+    vibrate: [200, 100, 200],
+    tag: data.movie_id || "filimo-notify",
+    renotify: true,
+    requireInteraction: false,
+    data: { movie_id: data.movie_id || null, url: data.movie_id ? `/movie/${data.movie_id}` : "/" },
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+// Open the relevant page when user taps notification
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || "/";
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((wins) => {
+      for (const w of wins) {
+        if ("focus" in w) {
+          w.navigate(url).catch(() => {});
+          return w.focus();
+        }
+      }
+      if (clients.openWindow) return clients.openWindow(url);
+    })
+  );
 });
