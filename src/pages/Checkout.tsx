@@ -164,10 +164,22 @@ const Checkout = () => {
         {/* Payment */}
         <div className="space-y-3">
           <h2 className="text-sm font-medium text-muted-foreground">Оплата</h2>
-          <div className="rounded-2xl border border-border bg-card p-4 text-sm text-foreground">
-            <p className="font-medium">Душанбе Сити / перевод на номер</p>
-            <p className="mt-1 text-muted-foreground">Оплатите <span className="font-bold text-primary">{total} сом.</span> на номер:</p>
-            <p className="mt-2 font-mono text-lg font-bold text-foreground">+992 XXX-XX-XX-XX</p>
+          <div className="rounded-2xl border border-border bg-card p-4 text-sm text-foreground space-y-3">
+            <p className="text-muted-foreground">
+              Переведите <span className="font-bold text-primary">{total} сом.</span> на один из реквизитов ниже и загрузите скриншот.
+            </p>
+            {shopCards.length > 0 ? (
+              <div className="space-y-2">
+                {shopCards.map((c) => (
+                  <div key={c.id} className="rounded-xl border border-border bg-secondary/40 p-3">
+                    <p className="font-mono text-base font-bold text-foreground select-all">{c.card_number}</p>
+                    {c.card_label && <p className="mt-0.5 text-xs text-muted-foreground">{c.card_label}</p>}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">Реквизиты для оплаты пока не добавлены. Свяжитесь с поддержкой.</p>
+            )}
           </div>
         </div>
 
