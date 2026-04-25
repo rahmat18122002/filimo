@@ -1,7 +1,15 @@
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { getDeviceId } from "@/lib/userStore";
+const DEVICE_KEY = "kino_device_id";
+function getDeviceId(): string {
+  let id = localStorage.getItem(DEVICE_KEY);
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem(DEVICE_KEY, id);
+  }
+  return id;
+}
 
 const VAPID_PUBLIC_KEY =
   "BOoNqh2FmKnef4KSIjFnFbihzkXwmkTvanYLFYkZa12jvppSBNrkgPDtDAjlA4ZC0tRvsaHuETbhY0JZ89STQuo";

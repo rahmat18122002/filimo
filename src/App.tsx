@@ -35,8 +35,14 @@ import SellersAdmin from "./pages/admin/SellersAdmin";
 import SellerOnboarding from "./pages/SellerOnboarding";
 import SellerDashboard from "./pages/SellerDashboard";
 import SellerStorefront from "./pages/SellerStorefront";
+import { useNewMovieNotifications } from "./hooks/usePushNotifications";
 
 const queryClient = new QueryClient();
+
+const NotificationsBootstrap = () => {
+  useNewMovieNotifications();
+  return null;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -45,6 +51,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <NotificationsBootstrap />
         <Routes>
           <Route path="/" element={<Welcome />} />
           <Route path="/home" element={<Index />} />
