@@ -878,6 +878,7 @@ export type Database = {
           created_at: string
           id: string
           is_active: boolean
+          purpose: string
         }
         Insert: {
           card_label?: string | null
@@ -885,6 +886,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          purpose?: string
         }
         Update: {
           card_label?: string | null
@@ -892,6 +894,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          purpose?: string
         }
         Relationships: []
       }
