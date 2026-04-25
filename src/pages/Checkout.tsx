@@ -34,11 +34,11 @@ const Checkout = () => {
           setTotal(data.reduce((s: number, i: any) => s + i.product.price * i.quantity, 0));
         }
       });
-    supabase.from("vip_cards")
+    (supabase.from("vip_cards") as any)
       .select("id, card_number, card_label, purpose, is_active")
       .eq("is_active", true)
-      .eq("purpose" as any, "shop")
-      .then(({ data }) => { if (data) setShopCards(data as any); });
+      .eq("purpose", "shop")
+      .then(({ data }: any) => { if (data) setShopCards(data); });
   }, []);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
