@@ -19,6 +19,7 @@ const Checkout = () => {
   const [screenshotUrl, setScreenshotUrl] = useState("");
   const [total, setTotal] = useState(0);
   const [cartItems, setCartItems] = useState<any[]>([]);
+  const [shopCards, setShopCards] = useState<{ id: string; card_number: string; card_label: string | null }[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
   const deviceId = localStorage.getItem("kino_device_id") || "";
 
@@ -33,6 +34,11 @@ const Checkout = () => {
           setTotal(data.reduce((s: number, i: any) => s + i.product.price * i.quantity, 0));
         }
       });
+    supabase.from("vip_cards")
+      .select("id, card_number, card_label, purpose, is_active")
+      .eq("is_active", true)
+      .eq("purpose" as any, "shop")
+      .then(({ data }) => { if (data) setShopCards(data as any); });
   }, []);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
