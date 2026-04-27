@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, ShoppingCart, Plus, Minus, Check, ShoppingBag } from "lucide-react";
+import { ArrowLeft, ShoppingCart, Plus, Minus, Check, ShoppingBag, Phone, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
@@ -30,6 +30,8 @@ const ShopProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
+  const [shopPhone, setShopPhone] = useState("");
+  const [shopWhatsapp, setShopWhatsapp] = useState("");
 
   useEffect(() => {
     if (!id) return;
@@ -38,6 +40,14 @@ const ShopProductDetail = () => {
     });
     supabase.from("shop_product_images").select("*").eq("product_id", id).order("sort_order").then(({ data }) => {
       if (data) setImages(data as ProductImage[]);
+    });
+    supabase.from("bot_settings").select("key, value").in("key", ["shop_phone", "shop_whatsapp"]).then(({ data }) => {
+      if (data) {
+        for (const row of data) {
+          if (row.key === "shop_phone") setShopPhone(row.value);
+          if (row.key === "shop_whatsapp") setShopWhatsapp(row.value);
+        }
+      }
     });
   }, [id]);
 
@@ -147,6 +157,32 @@ const ShopProductDetail = () => {
           </Button>
         </motion.div>
       </div>
+
+      {/* Floating contact buttons — звонок в магазин для уточнения деталей */}
+      {(shopPhone || shopWhatsapp) && (
+        <div className="fixed bottom-24 right-4 z-40 flex flex-col gap-3">
+          {shopWhatsapp && (
+            <a
+              href={`https://wa.me/${shopWhatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(`Здравствуйте! Интересует товар: ${product.title}`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-[hsl(142_70%_45%)] text-white shadow-lg transition-transform hover:scale-110 active:scale-95"
+              title="WhatsApp"
+            >
+              <MessageCircle className="h-5 w-5" />
+            </a>
+          )}
+          {shopPhone && (
+            <a
+              href={`tel:${shopPhone.replace(/\s/g, "")}`}
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-110 active:scale-95"
+              title="Позвонить"
+            >
+              <Phone className="h-5 w-5" />
+            </a>
+          )}
+        </div>
+      )}
     </div>
   );
 };
