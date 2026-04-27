@@ -7,8 +7,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+
+interface CategoryOption {
+  id: string;
+  name: string;
+}
 
 interface Movie {
   id: string;
@@ -38,10 +44,11 @@ const MoviesAdmin = () => {
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [editMovie, setEditMovie] = useState<Movie | null>(null);
-  const [form, setForm] = useState({ title: "", title_en: "", title_tg: "", title_fa: "", year: "", rating: "", genre: "", description: "", description_en: "", description_tg: "", description_fa: "", poster: "", duration: "", trailer_url: "", is_featured: false });
+  const [form, setForm] = useState({ title: "", year: "", rating: "", genre: [] as string[], description: "", poster: "", duration: "", trailer_url: "", is_featured: false });
   const [posterFile, setPosterFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-  
+  const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>([]);
+
   // Episodes
   const [epOpen, setEpOpen] = useState(false);
   const [epMovie, setEpMovie] = useState<Movie | null>(null);
@@ -54,23 +61,29 @@ const MoviesAdmin = () => {
     });
   };
 
-  useEffect(() => { loadMovies(); }, []);
+  const loadCategories = () => {
+    supabase.from("categories").select("id, name").eq("is_active", true).order("sort_order").then(({ data }) => {
+      if (data) setCategoryOptions((data as CategoryOption[]).filter((c) => c.name !== "Все"));
+    });
+  };
+
+  useEffect(() => { loadMovies(); loadCategories(); }, []);
 
   const filtered = movies.filter((m) => m.title.toLowerCase().includes(search.toLowerCase()));
 
   const openNew = () => {
     setEditMovie(null);
-    setForm({ title: "", title_en: "", title_tg: "", title_fa: "", year: "", rating: "", genre: "", description: "", description_en: "", description_tg: "", description_fa: "", poster: "", duration: "", trailer_url: "", is_featured: false });
+    setForm({ title: "", year: "", rating: "", genre: [], description: "", poster: "", duration: "", trailer_url: "", is_featured: false });
     setIsOpen(true);
   };
 
   const openEdit = (m: any) => {
     setEditMovie(m);
     setForm({
-      title: m.title, title_en: m.title_en || "", title_tg: m.title_tg || "", title_fa: m.title_fa || "",
+      title: m.title,
       year: String(m.year), rating: String(m.rating),
-      genre: m.genre.join(", "), description: m.description,
-      description_en: m.description_en || "", description_tg: m.description_tg || "", description_fa: m.description_fa || "",
+      genre: Array.isArray(m.genre) ? m.genre : [],
+      description: m.description,
       poster: m.poster, duration: m.duration, trailer_url: m.trailer_url || "", is_featured: m.is_featured,
     });
     setIsOpen(true);
@@ -85,6 +98,13 @@ const MoviesAdmin = () => {
     return data.publicUrl;
   };
 
+  const toggleGenre = (name: string) => {
+    setForm((f) => ({
+      ...f,
+      genre: f.genre.includes(name) ? f.genre.filter((g) => g !== name) : [...f.genre, name],
+    }));
+  };
+
   const handleSave = async () => {
     setUploading(true);
     try {
@@ -93,10 +113,10 @@ const MoviesAdmin = () => {
         posterUrl = await uploadPoster(posterFile);
       }
       const payload = {
-        title: form.title, title_en: form.title_en, title_tg: form.title_tg, title_fa: form.title_fa,
+        title: form.title,
         year: Number(form.year) || 2024, rating: Number(form.rating) || 0,
-        genre: form.genre.split(",").map((g) => g.trim()),
-        description: form.description, description_en: form.description_en, description_tg: form.description_tg, description_fa: form.description_fa,
+        genre: form.genre,
+        description: form.description,
         poster: posterUrl, duration: form.duration,
         trailer_url: form.trailer_url || null, is_featured: form.is_featured,
       };
@@ -225,20 +245,8 @@ const MoviesAdmin = () => {
           </DialogHeader>
           <div className="grid gap-4 py-2 max-h-[70vh] overflow-y-auto">
             <div className="grid gap-2">
-              <Label>Название (RU)</Label>
+              <Label>Название</Label>
               <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="bg-secondary border-border" />
-            </div>
-            <div className="grid gap-2">
-              <Label>Title (EN)</Label>
-              <Input value={form.title_en} onChange={(e) => setForm({ ...form, title_en: e.target.value })} className="bg-secondary border-border" />
-            </div>
-            <div className="grid gap-2">
-              <Label>Номи (TG)</Label>
-              <Input value={form.title_tg} onChange={(e) => setForm({ ...form, title_tg: e.target.value })} className="bg-secondary border-border" />
-            </div>
-            <div className="grid gap-2">
-              <Label>عنوان (FA)</Label>
-              <Input value={form.title_fa} onChange={(e) => setForm({ ...form, title_fa: e.target.value })} className="bg-secondary border-border" />
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div className="grid gap-2">
@@ -255,8 +263,22 @@ const MoviesAdmin = () => {
               </div>
             </div>
             <div className="grid gap-2">
-              <Label>Жанры (через запятую)</Label>
-              <Input value={form.genre} onChange={(e) => setForm({ ...form, genre: e.target.value })} className="bg-secondary border-border" />
+              <Label>Категории (выберите одну или несколько)</Label>
+              {categoryOptions.length === 0 ? (
+                <p className="text-xs text-muted-foreground">Нет категорий. Добавьте их в разделе «Категории».</p>
+              ) : (
+                <div className="grid grid-cols-2 gap-2 rounded-md border border-border bg-secondary/40 p-3">
+                  {categoryOptions.map((cat) => {
+                    const checked = form.genre.includes(cat.name);
+                    return (
+                      <label key={cat.id} className="flex items-center gap-2 cursor-pointer text-sm">
+                        <Checkbox checked={checked} onCheckedChange={() => toggleGenre(cat.name)} />
+                        <span className="text-foreground">{cat.name}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
             </div>
             <div className="grid gap-2">
               <Label>Постер (загрузить из галереи)</Label>
@@ -282,20 +304,8 @@ const MoviesAdmin = () => {
               <Input value={form.trailer_url} onChange={(e) => setForm({ ...form, trailer_url: e.target.value })} className="bg-secondary border-border" />
             </div>
             <div className="grid gap-2">
-              <Label>Описание (RU)</Label>
+              <Label>Описание</Label>
               <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="bg-secondary border-border" rows={3} />
-            </div>
-            <div className="grid gap-2">
-              <Label>Description (EN)</Label>
-              <Textarea value={form.description_en} onChange={(e) => setForm({ ...form, description_en: e.target.value })} className="bg-secondary border-border" rows={2} />
-            </div>
-            <div className="grid gap-2">
-              <Label>Тавсиф (TG)</Label>
-              <Textarea value={form.description_tg} onChange={(e) => setForm({ ...form, description_tg: e.target.value })} className="bg-secondary border-border" rows={2} />
-            </div>
-            <div className="grid gap-2">
-              <Label>توضیحات (FA)</Label>
-              <Textarea value={form.description_fa} onChange={(e) => setForm({ ...form, description_fa: e.target.value })} className="bg-secondary border-border" rows={2} />
             </div>
             <div className="flex items-center gap-3">
               <Switch checked={form.is_featured} onCheckedChange={(v) => setForm({ ...form, is_featured: v })} />
