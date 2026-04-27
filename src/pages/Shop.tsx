@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Search, SlidersHorizontal, ShoppingCart, X, ChevronDown, Home, Phone, MessageCircle, Store } from "lucide-react";
+import { ShoppingBag, Search, SlidersHorizontal, ShoppingCart, X, ChevronDown, Home, Store } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
@@ -44,8 +44,6 @@ const Shop = () => {
   const [sortBy, setSortBy] = useState<SortOption>("popular");
   const [showFilters, setShowFilters] = useState(false);
   const [cartCount, setCartCount] = useState(0);
-  const [shopPhone, setShopPhone] = useState("");
-  const [shopWhatsapp, setShopWhatsapp] = useState("");
   const [sellersMap, setSellersMap] = useState<Record<string, SellerInfo>>({});
   const [mySellerStatus, setMySellerStatus] = useState<"none" | "pending" | "active">("none");
 
@@ -61,14 +59,6 @@ const Shop = () => {
         const map: Record<string, SellerInfo> = {};
         (data as any[]).forEach(s => { map[s.id] = s; });
         setSellersMap(map);
-      }
-    });
-    supabase.from("bot_settings").select("key, value").in("key", ["shop_phone", "shop_whatsapp"]).then(({ data }) => {
-      if (data) {
-        for (const row of data) {
-          if (row.key === "shop_phone") setShopPhone(row.value);
-          if (row.key === "shop_whatsapp") setShopWhatsapp(row.value);
-        }
       }
     });
     // Cart count + seller status for current device
@@ -246,31 +236,6 @@ const Shop = () => {
         )}
       </div>
 
-      {/* Floating contact buttons */}
-      {(shopPhone || shopWhatsapp) && (
-        <div className="fixed bottom-6 right-4 z-40 flex flex-col gap-3">
-          {shopWhatsapp && (
-            <a
-              href={`https://wa.me/${shopWhatsapp.replace(/\D/g, "")}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-[hsl(142_70%_45%)] text-white shadow-lg transition-transform hover:scale-110 active:scale-95"
-              title="WhatsApp"
-            >
-              <MessageCircle className="h-5 w-5" />
-            </a>
-          )}
-          {shopPhone && (
-            <a
-              href={`tel:${shopPhone.replace(/\s/g, "")}`}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-110 active:scale-95"
-              title="Позвонить"
-            >
-              <Phone className="h-5 w-5" />
-            </a>
-          )}
-        </div>
-      )}
     </div>
   );
 };
