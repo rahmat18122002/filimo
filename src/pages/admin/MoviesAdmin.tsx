@@ -245,20 +245,8 @@ const MoviesAdmin = () => {
           </DialogHeader>
           <div className="grid gap-4 py-2 max-h-[70vh] overflow-y-auto">
             <div className="grid gap-2">
-              <Label>Название (RU)</Label>
+              <Label>Название</Label>
               <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="bg-secondary border-border" />
-            </div>
-            <div className="grid gap-2">
-              <Label>Title (EN)</Label>
-              <Input value={form.title_en} onChange={(e) => setForm({ ...form, title_en: e.target.value })} className="bg-secondary border-border" />
-            </div>
-            <div className="grid gap-2">
-              <Label>Номи (TG)</Label>
-              <Input value={form.title_tg} onChange={(e) => setForm({ ...form, title_tg: e.target.value })} className="bg-secondary border-border" />
-            </div>
-            <div className="grid gap-2">
-              <Label>عنوان (FA)</Label>
-              <Input value={form.title_fa} onChange={(e) => setForm({ ...form, title_fa: e.target.value })} className="bg-secondary border-border" />
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div className="grid gap-2">
@@ -275,8 +263,22 @@ const MoviesAdmin = () => {
               </div>
             </div>
             <div className="grid gap-2">
-              <Label>Жанры (через запятую)</Label>
-              <Input value={form.genre} onChange={(e) => setForm({ ...form, genre: e.target.value })} className="bg-secondary border-border" />
+              <Label>Категории (выберите одну или несколько)</Label>
+              {categoryOptions.length === 0 ? (
+                <p className="text-xs text-muted-foreground">Нет категорий. Добавьте их в разделе «Категории».</p>
+              ) : (
+                <div className="grid grid-cols-2 gap-2 rounded-md border border-border bg-secondary/40 p-3">
+                  {categoryOptions.map((cat) => {
+                    const checked = form.genre.includes(cat.name);
+                    return (
+                      <label key={cat.id} className="flex items-center gap-2 cursor-pointer text-sm">
+                        <Checkbox checked={checked} onCheckedChange={() => toggleGenre(cat.name)} />
+                        <span className="text-foreground">{cat.name}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
             </div>
             <div className="grid gap-2">
               <Label>Постер (загрузить из галереи)</Label>
@@ -302,20 +304,8 @@ const MoviesAdmin = () => {
               <Input value={form.trailer_url} onChange={(e) => setForm({ ...form, trailer_url: e.target.value })} className="bg-secondary border-border" />
             </div>
             <div className="grid gap-2">
-              <Label>Описание (RU)</Label>
+              <Label>Описание</Label>
               <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="bg-secondary border-border" rows={3} />
-            </div>
-            <div className="grid gap-2">
-              <Label>Description (EN)</Label>
-              <Textarea value={form.description_en} onChange={(e) => setForm({ ...form, description_en: e.target.value })} className="bg-secondary border-border" rows={2} />
-            </div>
-            <div className="grid gap-2">
-              <Label>Тавсиф (TG)</Label>
-              <Textarea value={form.description_tg} onChange={(e) => setForm({ ...form, description_tg: e.target.value })} className="bg-secondary border-border" rows={2} />
-            </div>
-            <div className="grid gap-2">
-              <Label>توضیحات (FA)</Label>
-              <Textarea value={form.description_fa} onChange={(e) => setForm({ ...form, description_fa: e.target.value })} className="bg-secondary border-border" rows={2} />
             </div>
             <div className="flex items-center gap-3">
               <Switch checked={form.is_featured} onCheckedChange={(v) => setForm({ ...form, is_featured: v })} />
