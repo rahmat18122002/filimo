@@ -61,23 +61,29 @@ const MoviesAdmin = () => {
     });
   };
 
-  useEffect(() => { loadMovies(); }, []);
+  const loadCategories = () => {
+    supabase.from("categories").select("id, name").eq("is_active", true).order("sort_order").then(({ data }) => {
+      if (data) setCategoryOptions((data as CategoryOption[]).filter((c) => c.name !== "Все"));
+    });
+  };
+
+  useEffect(() => { loadMovies(); loadCategories(); }, []);
 
   const filtered = movies.filter((m) => m.title.toLowerCase().includes(search.toLowerCase()));
 
   const openNew = () => {
     setEditMovie(null);
-    setForm({ title: "", title_en: "", title_tg: "", title_fa: "", year: "", rating: "", genre: "", description: "", description_en: "", description_tg: "", description_fa: "", poster: "", duration: "", trailer_url: "", is_featured: false });
+    setForm({ title: "", year: "", rating: "", genre: [], description: "", poster: "", duration: "", trailer_url: "", is_featured: false });
     setIsOpen(true);
   };
 
   const openEdit = (m: any) => {
     setEditMovie(m);
     setForm({
-      title: m.title, title_en: m.title_en || "", title_tg: m.title_tg || "", title_fa: m.title_fa || "",
+      title: m.title,
       year: String(m.year), rating: String(m.rating),
-      genre: m.genre.join(", "), description: m.description,
-      description_en: m.description_en || "", description_tg: m.description_tg || "", description_fa: m.description_fa || "",
+      genre: Array.isArray(m.genre) ? m.genre : [],
+      description: m.description,
       poster: m.poster, duration: m.duration, trailer_url: m.trailer_url || "", is_featured: m.is_featured,
     });
     setIsOpen(true);
@@ -92,6 +98,13 @@ const MoviesAdmin = () => {
     return data.publicUrl;
   };
 
+  const toggleGenre = (name: string) => {
+    setForm((f) => ({
+      ...f,
+      genre: f.genre.includes(name) ? f.genre.filter((g) => g !== name) : [...f.genre, name],
+    }));
+  };
+
   const handleSave = async () => {
     setUploading(true);
     try {
@@ -100,10 +113,10 @@ const MoviesAdmin = () => {
         posterUrl = await uploadPoster(posterFile);
       }
       const payload = {
-        title: form.title, title_en: form.title_en, title_tg: form.title_tg, title_fa: form.title_fa,
+        title: form.title,
         year: Number(form.year) || 2024, rating: Number(form.rating) || 0,
-        genre: form.genre.split(",").map((g) => g.trim()),
-        description: form.description, description_en: form.description_en, description_tg: form.description_tg, description_fa: form.description_fa,
+        genre: form.genre,
+        description: form.description,
         poster: posterUrl, duration: form.duration,
         trailer_url: form.trailer_url || null, is_featured: form.is_featured,
       };
