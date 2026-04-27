@@ -47,7 +47,11 @@ const HeroSlider = () => {
   const item = items[current];
 
   return (
-    <section className="relative w-full overflow-hidden rounded-2xl bg-background" style={{ aspectRatio: "16 / 9" }}>
+    <section className="relative w-full p-[2px] rounded-2xl overflow-hidden hero-slider-glow">
+      {/* Animated gradient border */}
+      <div className="absolute inset-0 rounded-2xl hero-border-anim" aria-hidden="true" />
+
+      <div className="relative w-full overflow-hidden rounded-2xl bg-background" style={{ aspectRatio: "16 / 9" }}>
       <AnimatePresence mode="wait">
         <motion.img
           key={item.id}
@@ -58,10 +62,11 @@ const HeroSlider = () => {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.7 }}
           className="absolute inset-0 h-full w-full object-cover"
+          style={{ filter: "brightness(1.1) saturate(1.15) contrast(1.05)" }}
         />
       </AnimatePresence>
-      <div className="absolute inset-0 bg-gradient-hero-overlay" />
-      <div className="absolute inset-0 bg-background/40" />
+      {/* Light bottom-only gradient so text stays readable but image stays bright */}
+      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-background/80 via-background/30 to-transparent" />
 
       <div className="relative z-10 flex h-full items-end pb-6 sm:pb-10 md:pb-16">
         <div className="container mx-auto px-4 sm:px-6">
