@@ -151,32 +151,26 @@ const MovieDetail = () => {
         {selectedEp && (
           <motion.div id="episode-player" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8">
             <h2 className="mb-4 text-xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>Сейчас: {selectedEp.title}</h2>
-            <div className="aspect-video overflow-hidden rounded-2xl bg-secondary flex items-center justify-center">
+            <div className="aspect-video overflow-hidden rounded-2xl bg-black relative">
               {selectedEp.video_url ? (
                 <iframe
                   src={getEmbedUrl(selectedEp.video_url)}
-                  className="h-full w-full border-0"
-                  allow="autoplay; encrypted-media; fullscreen"
+                  className="absolute border-0"
+                  style={{ top: "-56px", left: "0", width: "100%", height: "calc(100% + 112px)" }}
+                  allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
                   allowFullScreen
-                  title={selectedEp.title}
+                  referrerPolicy="no-referrer"
+                  title="player"
                 />
               ) : (
-                <div className="text-center text-muted-foreground">
-                  <Play className="mx-auto mb-2 h-12 w-12" />
-                  <p>Видео скоро будет доступно</p>
+                <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
+                  <div className="text-center">
+                    <Play className="mx-auto mb-2 h-12 w-12" />
+                    <p>Видео скоро будет доступно</p>
+                  </div>
                 </div>
               )}
             </div>
-            {selectedEp.video_url?.includes("t.me") && (
-              <a
-                href={selectedEp.video_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 inline-flex items-center gap-2 text-sm text-primary hover:underline"
-              >
-                <Play className="h-4 w-4" /> Открыть в Telegram
-              </a>
-            )}
           </motion.div>
         )}
 
