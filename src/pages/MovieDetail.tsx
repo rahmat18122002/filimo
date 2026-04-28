@@ -177,15 +177,36 @@ const MovieDetail = () => {
             <h2 className="mb-4 text-xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>Сейчас: {selectedEp.title}</h2>
             <div className="aspect-video overflow-hidden rounded-2xl bg-black relative">
               {selectedEp.video_url ? (
-                <iframe
-                  src={getEmbedUrl(selectedEp.video_url)}
-                  className="absolute border-0"
-                  style={{ top: "-56px", left: "0", width: "100%", height: "calc(100% + 112px)" }}
-                  allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-                  allowFullScreen
-                  referrerPolicy="no-referrer"
-                  title="player"
-                />
+                isDirectVideo(selectedEp.video_url) ? (
+                  <video
+                    src={selectedEp.video_url}
+                    className="absolute inset-0 h-full w-full"
+                    controls
+                    autoPlay
+                    playsInline
+                    controlsList="nodownload"
+                  />
+                ) : /^https?:\/\/t\.me\//i.test(selectedEp.video_url) ? (
+                  // Telegram embed needs masking to hide channel branding
+                  <iframe
+                    src={getEmbedUrl(selectedEp.video_url)}
+                    className="absolute border-0"
+                    style={{ top: "-56px", left: "0", width: "100%", height: "calc(100% + 112px)" }}
+                    allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                    allowFullScreen
+                    referrerPolicy="no-referrer"
+                    title="player"
+                  />
+                ) : (
+                  <iframe
+                    src={getEmbedUrl(selectedEp.video_url)}
+                    className="absolute inset-0 h-full w-full border-0"
+                    allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                    allowFullScreen
+                    referrerPolicy="no-referrer"
+                    title="player"
+                  />
+                )
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
                   <div className="text-center">
