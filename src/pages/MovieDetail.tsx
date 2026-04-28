@@ -56,14 +56,26 @@ const MovieDetail = () => {
 
   const userIsVip = isVip(user);
 
+  const getEmbedUrl = (url: string): string => {
+    // Telegram post: https://t.me/channel/123 → https://t.me/channel/123?embed=1&mode=tme
+    const tgMatch = url.match(/^https?:\/\/t\.me\/([^/]+)\/(\d+)/i);
+    if (tgMatch) {
+      return `https://t.me/${tgMatch[1]}/${tgMatch[2]}?embed=1&mode=tme`;
+    }
+    // YouTube
+    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+    if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}`;
+    return url;
+  };
+
   const handleEpisodeClick = (ep: Episode) => {
     if (ep.part_number <= 3 || userIsVip) {
-      if (ep.video_url) {
-        window.open(ep.video_url, "_blank");
-      } else {
-        setSelectedEp(ep);
-        setShowVipWall(false);
-      }
+      setSelectedEp(ep);
+      setShowVipWall(false);
+      // Scroll to player
+      setTimeout(() => {
+        document.getElementById("episode-player")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
     } else {
       setShowVipWall(true);
       setSelectedEp(null);
