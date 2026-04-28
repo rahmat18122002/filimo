@@ -56,14 +56,26 @@ const MovieDetail = () => {
 
   const userIsVip = isVip(user);
 
+  const getEmbedUrl = (url: string): string => {
+    // Telegram post: https://t.me/channel/123 → https://t.me/channel/123?embed=1&mode=tme
+    const tgMatch = url.match(/^https?:\/\/t\.me\/([^/]+)\/(\d+)/i);
+    if (tgMatch) {
+      return `https://t.me/${tgMatch[1]}/${tgMatch[2]}?embed=1&mode=tme`;
+    }
+    // YouTube
+    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+    if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}`;
+    return url;
+  };
+
   const handleEpisodeClick = (ep: Episode) => {
     if (ep.part_number <= 3 || userIsVip) {
-      if (ep.video_url) {
-        window.open(ep.video_url, "_blank");
-      } else {
-        setSelectedEp(ep);
-        setShowVipWall(false);
-      }
+      setSelectedEp(ep);
+      setShowVipWall(false);
+      // Scroll to player
+      setTimeout(() => {
+        document.getElementById("episode-player")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
     } else {
       setShowVipWall(true);
       setSelectedEp(null);
@@ -137,11 +149,17 @@ const MovieDetail = () => {
         )}
 
         {selectedEp && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8">
+          <motion.div id="episode-player" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8">
             <h2 className="mb-4 text-xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>Сейчас: {selectedEp.title}</h2>
             <div className="aspect-video overflow-hidden rounded-2xl bg-secondary flex items-center justify-center">
               {selectedEp.video_url ? (
-                <iframe src={selectedEp.video_url} className="h-full w-full" allowFullScreen title={selectedEp.title} />
+                <iframe
+                  src={getEmbedUrl(selectedEp.video_url)}
+                  className="h-full w-full border-0"
+                  allow="autoplay; encrypted-media; fullscreen"
+                  allowFullScreen
+                  title={selectedEp.title}
+                />
               ) : (
                 <div className="text-center text-muted-foreground">
                   <Play className="mx-auto mb-2 h-12 w-12" />
@@ -149,6 +167,16 @@ const MovieDetail = () => {
                 </div>
               )}
             </div>
+            {selectedEp.video_url?.includes("t.me") && (
+              <a
+                href={selectedEp.video_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center gap-2 text-sm text-primary hover:underline"
+              >
+                <Play className="h-4 w-4" /> Открыть в Telegram
+              </a>
+            )}
           </motion.div>
         )}
 
