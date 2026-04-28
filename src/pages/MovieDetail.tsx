@@ -167,16 +167,6 @@ const MovieDetail = () => {
                 </div>
               )}
             </div>
-            {selectedEp.video_url?.includes("t.me") && (
-              <a
-                href={selectedEp.video_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 inline-flex items-center gap-2 text-sm text-primary hover:underline"
-              >
-                <Play className="h-4 w-4" /> Открыть в Telegram
-              </a>
-            )}
           </motion.div>
         )}
 
