@@ -56,15 +56,39 @@ const MovieDetail = () => {
 
   const userIsVip = isVip(user);
 
+  // Detects direct video files (mp4/webm/m3u8/mov) — played in native HTML5 <video>
+  const isDirectVideo = (url: string): boolean => {
+    return /\.(mp4|webm|m3u8|mov|mkv)(\?.*)?$/i.test(url);
+  };
+
+  // Converts a hosted-video URL into a clean embed URL (no channel branding)
   const getEmbedUrl = (url: string): string => {
-    // Telegram post: https://t.me/channel/123 → https://t.me/channel/123?embed=1&mode=tme
+    // YouTube → clean embed
+    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]+)/);
+    if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?rel=0&modestbranding=1`;
+
+    // VK Video — already an embed link
+    if (/vk\.com\/video_ext\.php/i.test(url)) return url;
+    // VK Video — convert vk.com/video-123_456 → embed
+    const vkMatch = url.match(/vk\.com\/video(-?\d+)_(\d+)/i);
+    if (vkMatch) return `https://vk.com/video_ext.php?oid=${vkMatch[1]}&id=${vkMatch[2]}&hd=2`;
+
+    // Rutube
+    const rtMatch = url.match(/rutube\.ru\/video\/([\w]+)/i);
+    if (rtMatch) return `https://rutube.ru/play/embed/${rtMatch[1]}`;
+
+    // OK.ru → embed
+    const okMatch = url.match(/ok\.ru\/video\/(\d+)/i);
+    if (okMatch) return `https://ok.ru/videoembed/${okMatch[1]}`;
+
+    // Dailymotion
+    const dmMatch = url.match(/dailymotion\.com\/video\/([\w]+)/i);
+    if (dmMatch) return `https://www.dailymotion.com/embed/video/${dmMatch[1]}`;
+
+    // Telegram public post fallback (kept for compatibility)
     const tgMatch = url.match(/^https?:\/\/t\.me\/([^/]+)\/(\d+)/i);
-    if (tgMatch) {
-      return `https://t.me/${tgMatch[1]}/${tgMatch[2]}?embed=1&mode=tme`;
-    }
-    // YouTube
-    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
-    if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}`;
+    if (tgMatch) return `https://t.me/${tgMatch[1]}/${tgMatch[2]}?embed=1&mode=tme`;
+
     return url;
   };
 
@@ -153,15 +177,36 @@ const MovieDetail = () => {
             <h2 className="mb-4 text-xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>Сейчас: {selectedEp.title}</h2>
             <div className="aspect-video overflow-hidden rounded-2xl bg-black relative">
               {selectedEp.video_url ? (
-                <iframe
-                  src={getEmbedUrl(selectedEp.video_url)}
-                  className="absolute border-0"
-                  style={{ top: "-56px", left: "0", width: "100%", height: "calc(100% + 112px)" }}
-                  allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-                  allowFullScreen
-                  referrerPolicy="no-referrer"
-                  title="player"
-                />
+                isDirectVideo(selectedEp.video_url) ? (
+                  <video
+                    src={selectedEp.video_url}
+                    className="absolute inset-0 h-full w-full"
+                    controls
+                    autoPlay
+                    playsInline
+                    controlsList="nodownload"
+                  />
+                ) : /^https?:\/\/t\.me\//i.test(selectedEp.video_url) ? (
+                  // Telegram embed needs masking to hide channel branding
+                  <iframe
+                    src={getEmbedUrl(selectedEp.video_url)}
+                    className="absolute border-0"
+                    style={{ top: "-56px", left: "0", width: "100%", height: "calc(100% + 112px)" }}
+                    allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                    allowFullScreen
+                    referrerPolicy="no-referrer"
+                    title="player"
+                  />
+                ) : (
+                  <iframe
+                    src={getEmbedUrl(selectedEp.video_url)}
+                    className="absolute inset-0 h-full w-full border-0"
+                    allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                    allowFullScreen
+                    referrerPolicy="no-referrer"
+                    title="player"
+                  />
+                )
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
                   <div className="text-center">
