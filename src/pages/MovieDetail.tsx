@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { autoRegister, isVip, type AppUser } from "@/lib/userStore";
 import { useI18n, getLocalizedField } from "@/lib/i18n";
+import { CustomVideoPlayer } from "@/components/CustomVideoPlayer";
 
 interface Movie {
   id: string;
@@ -178,13 +179,10 @@ const MovieDetail = () => {
             <div className="aspect-video overflow-hidden rounded-2xl bg-black relative">
               {selectedEp.video_url ? (
                 isDirectVideo(selectedEp.video_url) ? (
-                  <video
+                  <CustomVideoPlayer
                     src={selectedEp.video_url}
+                    poster={movie.poster}
                     className="absolute inset-0 h-full w-full"
-                    controls
-                    autoPlay
-                    playsInline
-                    controlsList="nodownload"
                   />
                 ) : /^https?:\/\/t\.me\//i.test(selectedEp.video_url) ? (
                   // Telegram embed needs masking to hide channel branding
