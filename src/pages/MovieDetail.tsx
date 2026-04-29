@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { autoRegister, isVip, type AppUser } from "@/lib/userStore";
 import { useI18n, getLocalizedField } from "@/lib/i18n";
-import { CustomVideoPlayer } from "@/components/CustomVideoPlayer";
+import { CustomVideoPlayer, type VideoQuality } from "@/components/CustomVideoPlayer";
 
 interface Movie {
   id: string;
@@ -60,6 +60,21 @@ const MovieDetail = () => {
   // Detects direct video files (mp4/webm/m3u8/mov) — played in native HTML5 <video>
   const isDirectVideo = (url: string): boolean => {
     return /\.(mp4|webm|m3u8|mov|mkv)(\?.*)?$/i.test(url);
+  };
+
+  const getDirectVideoQualities = (rawUrl: string): VideoQuality[] => {
+    const lines = rawUrl
+      .split(/\n+/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    return lines
+      .map((line, index) => {
+        const match = line.match(/^([^|=]+)[|=](https?:\/\/.+)$/i);
+        const src = match ? match[2].trim() : line;
+        return isDirectVideo(src) ? { label: match ? match[1].trim() : index === 0 ? "Авто" : `${index + 1}`, src } : null;
+      })
+      .filter((item): item is VideoQuality => Boolean(item));
   };
 
   // Converts a hosted-video URL into a clean embed URL (no channel branding)
@@ -178,9 +193,9 @@ const MovieDetail = () => {
             <h2 className="mb-4 text-xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>Сейчас: {selectedEp.title}</h2>
             <div className="aspect-video overflow-hidden rounded-2xl bg-black relative">
               {selectedEp.video_url ? (
-                isDirectVideo(selectedEp.video_url) ? (
+                getDirectVideoQualities(selectedEp.video_url).length > 0 ? (
                   <CustomVideoPlayer
-                    src={selectedEp.video_url}
+                    qualities={getDirectVideoQualities(selectedEp.video_url)}
                     poster={movie.poster}
                     className="absolute inset-0 h-full w-full"
                   />
