@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import Hls from "hls.js";
 import {
   Play,
   Pause,
@@ -39,6 +40,10 @@ const formatTime = (s: number) => {
 
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
+type WebkitVideoElement = HTMLVideoElement & {
+  webkitEnterFullscreen?: () => void;
+};
+
 export const CustomVideoPlayer = ({
   src,
   qualities,
@@ -72,6 +77,45 @@ export const CustomVideoPlayer = ({
   const [settingsView, setSettingsView] = useState<"main" | "quality" | "speed">("main");
 
   const activeSrc = qualityList[currentQuality]?.src;
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !activeSrc) return;
+
+    setLoading(true);
+    setProgress(0);
+    setBuffered(0);
+
+    let hls: Hls | null = null;
+    const isHlsSource = /\.m3u8(?:\?.*)?$/i.test(activeSrc);
+
+    if (isHlsSource && Hls.isSupported()) {
+      hls = new Hls({ enableWorker: true });
+      hls.loadSource(activeSrc);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.playbackRate = speed;
+        if (autoPlay) video.play().catch(() => {});
+      });
+    } else {
+      video.src = activeSrc;
+      video.load();
+      video.playbackRate = speed;
+      if (autoPlay) {
+        const playWhenReady = () => video.play().catch(() => {});
+        video.addEventListener("canplay", playWhenReady, { once: true });
+      }
+    }
+
+    return () => {
+      hls?.destroy();
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+    };
+    // activeSrc change must reload the media; speed changes are handled separately.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSrc, autoPlay]);
 
   // Auto-hide controls
   const resetHideTimer = useCallback(() => {
@@ -154,7 +198,11 @@ export const CustomVideoPlayer = ({
     const el = containerRef.current;
     if (!el) return;
     if (!document.fullscreenElement) {
-      el.requestFullscreen?.().catch(() => {});
+      if (el.requestFullscreen) {
+        el.requestFullscreen().catch(() => {});
+      } else {
+        (videoRef.current as WebkitVideoElement | null)?.webkitEnterFullscreen?.();
+      }
     } else {
       document.exitFullscreen?.().catch(() => {});
     }
@@ -219,7 +267,6 @@ export const CustomVideoPlayer = ({
     >
       <video
         ref={videoRef}
-        src={activeSrc}
         poster={poster}
         autoPlay={autoPlay}
         playsInline
