@@ -218,14 +218,23 @@ const MovieDetail = () => {
                     title="player"
                   />
                 ) : (
-                  <iframe
-                    src={getEmbedUrl(selectedEp.video_url)}
-                    className="absolute inset-0 h-full w-full border-0"
-                    allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-                    allowFullScreen
-                    referrerPolicy="no-referrer"
-                    title="player"
-                  />
+                  <>
+                    <iframe
+                      src={getEmbedUrl(selectedEp.video_url)}
+                      className="absolute inset-0 h-full w-full border-0"
+                      allow="autoplay; encrypted-media; fullscreen; picture-in-picture; accelerometer; gyroscope"
+                      allowFullScreen
+                      title="player"
+                    />
+                    <a
+                      href={selectedEp.video_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute bottom-2 right-2 z-10 rounded-md bg-background/70 px-2 py-1 text-xs text-foreground backdrop-blur-sm hover:bg-background/90"
+                    >
+                      Открыть в источнике ↗
+                    </a>
+                  </>
                 )
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
