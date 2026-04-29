@@ -78,30 +78,37 @@ const MovieDetail = () => {
   };
 
   // Converts a hosted-video URL into a clean embed URL (no channel branding)
-  const getEmbedUrl = (url: string): string => {
-    // YouTube → clean embed
-    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]+)/);
-    if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?rel=0&modestbranding=1`;
+  const getEmbedUrl = (rawUrl: string): string => {
+    const url = rawUrl.trim();
 
-    // VK Video — already an embed link
+    // ===== YouTube =====
+    // Supports: youtu.be/ID, youtube.com/watch?v=ID, /embed/ID, /shorts/ID, /live/ID, with ?si=, &t=, etc.
+    const ytMatch = url.match(
+      /(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/|v\/)|youtu\.be\/)([\w-]{6,})/i
+    );
+    if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?rel=0&modestbranding=1&playsinline=1`;
+
+    // ===== VK Video =====
     if (/vk\.com\/video_ext\.php/i.test(url)) return url;
-    // VK Video — convert vk.com/video-123_456 → embed
-    const vkMatch = url.match(/vk\.com\/video(-?\d+)_(\d+)/i);
-    if (vkMatch) return `https://vk.com/video_ext.php?oid=${vkMatch[1]}&id=${vkMatch[2]}&hd=2`;
+    const vkMatch = url.match(/(?:vk\.com|vkvideo\.ru|vk\.ru)\/video(-?\d+)_(\d+)/i);
+    if (vkMatch) return `https://vk.com/video_ext.php?oid=${vkMatch[1]}&id=${vkMatch[2]}&hd=2&autoplay=0`;
 
-    // Rutube
+    // ===== OK.ru (Одноклассники) =====
+    if (/ok\.ru\/videoembed\//i.test(url)) return url;
+    const okMatch = url.match(/ok\.ru\/(?:video|live)\/(\d+)/i);
+    if (okMatch) return `https://ok.ru/videoembed/${okMatch[1]}`;
+
+    // ===== Dailymotion =====
+    // Supports: dailymotion.com/video/xxx, dai.ly/xxx, dailymotion.com/embed/video/xxx
+    if (/dailymotion\.com\/embed\/video\//i.test(url)) return url;
+    const dmMatch = url.match(/(?:dailymotion\.com\/(?:video|hub)\/|dai\.ly\/)([a-zA-Z0-9]+)/i);
+    if (dmMatch) return `https://www.dailymotion.com/embed/video/${dmMatch[1]}`;
+
+    // ===== Rutube =====
     const rtMatch = url.match(/rutube\.ru\/video\/([\w]+)/i);
     if (rtMatch) return `https://rutube.ru/play/embed/${rtMatch[1]}`;
 
-    // OK.ru → embed
-    const okMatch = url.match(/ok\.ru\/video\/(\d+)/i);
-    if (okMatch) return `https://ok.ru/videoembed/${okMatch[1]}`;
-
-    // Dailymotion
-    const dmMatch = url.match(/dailymotion\.com\/video\/([\w]+)/i);
-    if (dmMatch) return `https://www.dailymotion.com/embed/video/${dmMatch[1]}`;
-
-    // Telegram public post fallback (kept for compatibility)
+    // ===== Telegram public post fallback =====
     const tgMatch = url.match(/^https?:\/\/t\.me\/([^/]+)\/(\d+)/i);
     if (tgMatch) return `https://t.me/${tgMatch[1]}/${tgMatch[2]}?embed=1&mode=tme`;
 
