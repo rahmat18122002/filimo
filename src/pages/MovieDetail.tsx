@@ -77,32 +77,46 @@ const MovieDetail = () => {
       .filter((item): item is VideoQuality => Boolean(item));
   };
 
-  // Converts a hosted-video URL into a clean embed URL (no channel branding)
+  // Detects which provider — needed to apply per-provider masking overlays
+  const getProvider = (rawUrl: string): "youtube" | "vk" | "ok" | "dailymotion" | "rutube" | "telegram" | "other" => {
+    const url = rawUrl.trim();
+    if (/(?:youtube\.com|youtu\.be)/i.test(url)) return "youtube";
+    if (/(?:vk\.com|vkvideo\.ru|vk\.ru)/i.test(url)) return "vk";
+    if (/ok\.ru/i.test(url)) return "ok";
+    if (/(?:dailymotion\.com|dai\.ly)/i.test(url)) return "dailymotion";
+    if (/rutube\.ru/i.test(url)) return "rutube";
+    if (/^https?:\/\/t\.me\//i.test(url)) return "telegram";
+    return "other";
+  };
+
+  // Converts a hosted-video URL into a clean embed URL (max-hidden branding)
   const getEmbedUrl = (rawUrl: string): string => {
     const url = rawUrl.trim();
 
-    // ===== YouTube =====
-    // Supports: youtu.be/ID, youtube.com/watch?v=ID, /embed/ID, /shorts/ID, /live/ID, with ?si=, &t=, etc.
+    // ===== YouTube ===== (most aggressive privacy params)
     const ytMatch = url.match(
       /(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/|v\/)|youtu\.be\/)([\w-]{6,})/i
     );
-    if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?rel=0&modestbranding=1&playsinline=1`;
+    if (ytMatch) {
+      const id = ytMatch[1];
+      // youtube-nocookie + hide controls/info/related/branding
+      return `https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1&playsinline=1&showinfo=0&iv_load_policy=3&fs=1&disablekb=1&controls=1&color=white&playlist=${id}&loop=0`;
+    }
 
     // ===== VK Video =====
     if (/vk\.com\/video_ext\.php/i.test(url)) return url;
     const vkMatch = url.match(/(?:vk\.com|vkvideo\.ru|vk\.ru)\/video(-?\d+)_(\d+)/i);
-    if (vkMatch) return `https://vk.com/video_ext.php?oid=${vkMatch[1]}&id=${vkMatch[2]}&hd=2&autoplay=0`;
+    if (vkMatch) return `https://vk.com/video_ext.php?oid=${vkMatch[1]}&id=${vkMatch[2]}&hd=2&autoplay=0&hide_logo=1`;
 
-    // ===== OK.ru (Одноклассники) =====
+    // ===== OK.ru =====
     if (/ok\.ru\/videoembed\//i.test(url)) return url;
     const okMatch = url.match(/ok\.ru\/(?:video|live)\/(\d+)/i);
-    if (okMatch) return `https://ok.ru/videoembed/${okMatch[1]}`;
+    if (okMatch) return `https://ok.ru/videoembed/${okMatch[1]}?nochat=1&autoplay=0`;
 
-    // ===== Dailymotion =====
-    // Supports: dailymotion.com/video/xxx, dai.ly/xxx, dailymotion.com/embed/video/xxx
+    // ===== Dailymotion ===== (no logo, no info, no share)
     if (/dailymotion\.com\/embed\/video\//i.test(url)) return url;
     const dmMatch = url.match(/(?:dailymotion\.com\/(?:video|hub)\/|dai\.ly\/)([a-zA-Z0-9]+)/i);
-    if (dmMatch) return `https://www.dailymotion.com/embed/video/${dmMatch[1]}`;
+    if (dmMatch) return `https://www.dailymotion.com/embed/video/${dmMatch[1]}?ui-logo=0&sharing-enable=0&ui-start-screen-info=0&queue-enable=0&endscreen-enable=0`;
 
     // ===== Rutube =====
     const rtMatch = url.match(/rutube\.ru\/video\/([\w]+)/i);
