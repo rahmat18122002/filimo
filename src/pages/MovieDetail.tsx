@@ -212,7 +212,7 @@ const MovieDetail = () => {
         {selectedEp && (
           <motion.div id="episode-player" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8">
             <h2 className="mb-4 text-xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>Сейчас: {selectedEp.title}</h2>
-            <div className="aspect-video overflow-hidden rounded-2xl bg-black relative">
+            <div className="aspect-video overflow-hidden rounded-2xl bg-black relative select-none">
               {selectedEp.video_url ? (
                 getDirectVideoQualities(selectedEp.video_url).length > 0 ? (
                   <CustomVideoPlayer
@@ -220,36 +220,39 @@ const MovieDetail = () => {
                     poster={movie.poster}
                     className="absolute inset-0 h-full w-full"
                   />
-                ) : /^https?:\/\/t\.me\//i.test(selectedEp.video_url) ? (
-                  // Telegram embed needs masking to hide channel branding
-                  <iframe
-                    src={getEmbedUrl(selectedEp.video_url)}
-                    className="absolute border-0"
-                    style={{ top: "-56px", left: "0", width: "100%", height: "calc(100% + 112px)" }}
-                    allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-                    allowFullScreen
-                    referrerPolicy="no-referrer"
-                    title="player"
-                  />
-                ) : (
-                  <>
-                    <iframe
-                      src={getEmbedUrl(selectedEp.video_url)}
-                      className="absolute inset-0 h-full w-full border-0"
-                      allow="autoplay; encrypted-media; fullscreen; picture-in-picture; accelerometer; gyroscope"
-                      allowFullScreen
-                      title="player"
-                    />
-                    <a
-                      href={selectedEp.video_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="absolute bottom-2 right-2 z-10 rounded-md bg-background/70 px-2 py-1 text-xs text-foreground backdrop-blur-sm hover:bg-background/90"
-                    >
-                      Открыть в источнике ↗
-                    </a>
-                  </>
-                )
+                ) : (() => {
+                    const provider = getProvider(selectedEp.video_url);
+                    const isTelegram = provider === "telegram";
+                    return (
+                      <>
+                        {/* Iframe — for Telegram we shift it up to crop the channel header */}
+                        <iframe
+                          src={getEmbedUrl(selectedEp.video_url)}
+                          className={isTelegram ? "absolute border-0" : "absolute inset-0 h-full w-full border-0"}
+                          style={isTelegram ? { top: "-56px", left: 0, width: "100%", height: "calc(100% + 112px)" } : undefined}
+                          allow="autoplay; encrypted-media; fullscreen; picture-in-picture; accelerometer; gyroscope"
+                          allowFullScreen
+                          title="Filimo Player"
+                        />
+
+                        {/* === BRANDING MASKS — hide source logos / channel names / share buttons === */}
+                        {/* Top-right corner mask — hides YouTube logo, VK logo, Dailymotion logo, share/more buttons */}
+                        <div className="pointer-events-auto absolute top-0 right-0 h-12 w-32 bg-black z-10" aria-hidden />
+                        {/* Top-left mask — hides "Watch on YouTube", channel avatar, video title overlay */}
+                        <div className="pointer-events-auto absolute top-0 left-0 h-12 bg-black z-10" style={{ width: "55%" }} aria-hidden />
+                        {/* Bottom-right mask — hides YouTube logo in controls, "YouTube" watermark */}
+                        <div className="pointer-events-auto absolute bottom-0 right-0 h-10 w-24 bg-black z-10" aria-hidden />
+
+                        {/* Our brand watermark on top — establishes Filimo as the player */}
+                        <div className="pointer-events-none absolute top-2 left-3 z-20 flex items-center gap-1.5">
+                          <Crown className="h-4 w-4 text-accent" />
+                          <span className="text-xs font-bold tracking-wider text-foreground/90" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}>
+                            FILIMO VIP
+                          </span>
+                        </div>
+                      </>
+                    );
+                  })()
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
                   <div className="text-center">
@@ -261,8 +264,6 @@ const MovieDetail = () => {
             </div>
           </motion.div>
         )}
-
-        {showVipWall && (
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="mt-8 rounded-2xl border border-accent/30 bg-accent/5 p-8 text-center">
             <Crown className="mx-auto mb-3 h-12 w-12 text-accent" />
             <h3 className="text-xl font-bold text-foreground">Требуется VIP-подписка</h3>
