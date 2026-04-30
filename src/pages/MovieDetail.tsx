@@ -77,32 +77,46 @@ const MovieDetail = () => {
       .filter((item): item is VideoQuality => Boolean(item));
   };
 
-  // Converts a hosted-video URL into a clean embed URL (no channel branding)
+  // Detects which provider — needed to apply per-provider masking overlays
+  const getProvider = (rawUrl: string): "youtube" | "vk" | "ok" | "dailymotion" | "rutube" | "telegram" | "other" => {
+    const url = rawUrl.trim();
+    if (/(?:youtube\.com|youtu\.be)/i.test(url)) return "youtube";
+    if (/(?:vk\.com|vkvideo\.ru|vk\.ru)/i.test(url)) return "vk";
+    if (/ok\.ru/i.test(url)) return "ok";
+    if (/(?:dailymotion\.com|dai\.ly)/i.test(url)) return "dailymotion";
+    if (/rutube\.ru/i.test(url)) return "rutube";
+    if (/^https?:\/\/t\.me\//i.test(url)) return "telegram";
+    return "other";
+  };
+
+  // Converts a hosted-video URL into a clean embed URL (max-hidden branding)
   const getEmbedUrl = (rawUrl: string): string => {
     const url = rawUrl.trim();
 
-    // ===== YouTube =====
-    // Supports: youtu.be/ID, youtube.com/watch?v=ID, /embed/ID, /shorts/ID, /live/ID, with ?si=, &t=, etc.
+    // ===== YouTube ===== (most aggressive privacy params)
     const ytMatch = url.match(
       /(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/|v\/)|youtu\.be\/)([\w-]{6,})/i
     );
-    if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?rel=0&modestbranding=1&playsinline=1`;
+    if (ytMatch) {
+      const id = ytMatch[1];
+      // youtube-nocookie + hide controls/info/related/branding
+      return `https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1&playsinline=1&showinfo=0&iv_load_policy=3&fs=1&disablekb=1&controls=1&color=white&playlist=${id}&loop=0`;
+    }
 
     // ===== VK Video =====
     if (/vk\.com\/video_ext\.php/i.test(url)) return url;
     const vkMatch = url.match(/(?:vk\.com|vkvideo\.ru|vk\.ru)\/video(-?\d+)_(\d+)/i);
-    if (vkMatch) return `https://vk.com/video_ext.php?oid=${vkMatch[1]}&id=${vkMatch[2]}&hd=2&autoplay=0`;
+    if (vkMatch) return `https://vk.com/video_ext.php?oid=${vkMatch[1]}&id=${vkMatch[2]}&hd=2&autoplay=0&hide_logo=1`;
 
-    // ===== OK.ru (Одноклассники) =====
+    // ===== OK.ru =====
     if (/ok\.ru\/videoembed\//i.test(url)) return url;
     const okMatch = url.match(/ok\.ru\/(?:video|live)\/(\d+)/i);
-    if (okMatch) return `https://ok.ru/videoembed/${okMatch[1]}`;
+    if (okMatch) return `https://ok.ru/videoembed/${okMatch[1]}?nochat=1&autoplay=0`;
 
-    // ===== Dailymotion =====
-    // Supports: dailymotion.com/video/xxx, dai.ly/xxx, dailymotion.com/embed/video/xxx
+    // ===== Dailymotion ===== (no logo, no info, no share)
     if (/dailymotion\.com\/embed\/video\//i.test(url)) return url;
     const dmMatch = url.match(/(?:dailymotion\.com\/(?:video|hub)\/|dai\.ly\/)([a-zA-Z0-9]+)/i);
-    if (dmMatch) return `https://www.dailymotion.com/embed/video/${dmMatch[1]}`;
+    if (dmMatch) return `https://www.dailymotion.com/embed/video/${dmMatch[1]}?ui-logo=0&sharing-enable=0&ui-start-screen-info=0&queue-enable=0&endscreen-enable=0`;
 
     // ===== Rutube =====
     const rtMatch = url.match(/rutube\.ru\/video\/([\w]+)/i);
@@ -198,7 +212,7 @@ const MovieDetail = () => {
         {selectedEp && (
           <motion.div id="episode-player" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8">
             <h2 className="mb-4 text-xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>Сейчас: {selectedEp.title}</h2>
-            <div className="aspect-video overflow-hidden rounded-2xl bg-black relative">
+            <div className="aspect-video overflow-hidden rounded-2xl bg-black relative select-none">
               {selectedEp.video_url ? (
                 getDirectVideoQualities(selectedEp.video_url).length > 0 ? (
                   <CustomVideoPlayer
@@ -206,36 +220,39 @@ const MovieDetail = () => {
                     poster={movie.poster}
                     className="absolute inset-0 h-full w-full"
                   />
-                ) : /^https?:\/\/t\.me\//i.test(selectedEp.video_url) ? (
-                  // Telegram embed needs masking to hide channel branding
-                  <iframe
-                    src={getEmbedUrl(selectedEp.video_url)}
-                    className="absolute border-0"
-                    style={{ top: "-56px", left: "0", width: "100%", height: "calc(100% + 112px)" }}
-                    allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-                    allowFullScreen
-                    referrerPolicy="no-referrer"
-                    title="player"
-                  />
-                ) : (
-                  <>
-                    <iframe
-                      src={getEmbedUrl(selectedEp.video_url)}
-                      className="absolute inset-0 h-full w-full border-0"
-                      allow="autoplay; encrypted-media; fullscreen; picture-in-picture; accelerometer; gyroscope"
-                      allowFullScreen
-                      title="player"
-                    />
-                    <a
-                      href={selectedEp.video_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="absolute bottom-2 right-2 z-10 rounded-md bg-background/70 px-2 py-1 text-xs text-foreground backdrop-blur-sm hover:bg-background/90"
-                    >
-                      Открыть в источнике ↗
-                    </a>
-                  </>
-                )
+                ) : (() => {
+                    const provider = getProvider(selectedEp.video_url);
+                    const isTelegram = provider === "telegram";
+                    return (
+                      <>
+                        {/* Iframe — for Telegram we shift it up to crop the channel header */}
+                        <iframe
+                          src={getEmbedUrl(selectedEp.video_url)}
+                          className={isTelegram ? "absolute border-0" : "absolute inset-0 h-full w-full border-0"}
+                          style={isTelegram ? { top: "-56px", left: 0, width: "100%", height: "calc(100% + 112px)" } : undefined}
+                          allow="autoplay; encrypted-media; fullscreen; picture-in-picture; accelerometer; gyroscope"
+                          allowFullScreen
+                          title="Filimo Player"
+                        />
+
+                        {/* === BRANDING MASKS — hide source logos / channel names / share buttons === */}
+                        {/* Top-right corner mask — hides YouTube logo, VK logo, Dailymotion logo, share/more buttons */}
+                        <div className="pointer-events-auto absolute top-0 right-0 h-12 w-32 bg-black z-10" aria-hidden />
+                        {/* Top-left mask — hides "Watch on YouTube", channel avatar, video title overlay */}
+                        <div className="pointer-events-auto absolute top-0 left-0 h-12 bg-black z-10" style={{ width: "55%" }} aria-hidden />
+                        {/* Bottom-right mask — hides YouTube logo in controls, "YouTube" watermark */}
+                        <div className="pointer-events-auto absolute bottom-0 right-0 h-10 w-24 bg-black z-10" aria-hidden />
+
+                        {/* Our brand watermark on top — establishes Filimo as the player */}
+                        <div className="pointer-events-none absolute top-2 left-3 z-20 flex items-center gap-1.5">
+                          <Crown className="h-4 w-4 text-accent" />
+                          <span className="text-xs font-bold tracking-wider text-foreground/90" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}>
+                            FILIMO VIP
+                          </span>
+                        </div>
+                      </>
+                    );
+                  })()
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
                   <div className="text-center">
