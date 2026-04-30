@@ -264,6 +264,8 @@ const MovieDetail = () => {
             </div>
           </motion.div>
         )}
+
+        {showVipWall && (
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="mt-8 rounded-2xl border border-accent/30 bg-accent/5 p-8 text-center">
             <Crown className="mx-auto mb-3 h-12 w-12 text-accent" />
             <h3 className="text-xl font-bold text-foreground">Требуется VIP-подписка</h3>
