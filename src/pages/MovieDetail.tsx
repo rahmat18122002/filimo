@@ -235,21 +235,6 @@ const MovieDetail = () => {
                           title="Filimo Player"
                         />
 
-                        {/* === BRANDING MASKS — hide source logos / channel names / share buttons === */}
-                        {/* Top-right corner mask — hides YouTube logo, VK logo, Dailymotion logo, share/more buttons */}
-                        <div className="pointer-events-auto absolute top-0 right-0 h-12 w-32 bg-black z-10" aria-hidden />
-                        {/* Top-left mask — hides "Watch on YouTube", channel avatar, video title overlay */}
-                        <div className="pointer-events-auto absolute top-0 left-0 h-12 bg-black z-10" style={{ width: "55%" }} aria-hidden />
-                        {/* Bottom-right mask — hides YouTube logo in controls, "YouTube" watermark */}
-                        <div className="pointer-events-auto absolute bottom-0 right-0 h-10 w-24 bg-black z-10" aria-hidden />
-
-                        {/* Our brand watermark on top — establishes Filimo as the player */}
-                        <div className="pointer-events-none absolute top-2 left-3 z-20 flex items-center gap-1.5">
-                          <Crown className="h-4 w-4 text-accent" />
-                          <span className="text-xs font-bold tracking-wider text-foreground/90" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}>
-                            FILIMO VIP
-                          </span>
-                        </div>
                       </>
                     );
                   })()
