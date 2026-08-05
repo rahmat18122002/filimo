@@ -343,8 +343,9 @@ const MoviesAdmin = () => {
                 {/* Edit episode link inline */}
                 <div className="flex gap-2">
                   <Input
+                    key={ep.video_url || "empty"}
                     defaultValue={ep.video_url || ""}
-                    placeholder="Ссылка (Telegram/URL)"
+                    placeholder="Ссылка (Telegram/URL) или загрузите файл"
                     className="bg-background border-border text-xs h-8 flex-1"
                     onBlur={async (e) => {
                       const newUrl = e.target.value;
