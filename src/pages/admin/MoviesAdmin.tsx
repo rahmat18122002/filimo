@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import VideoUploadButton from "@/components/admin/VideoUploadButton";
 
 interface CategoryOption {
   id: string;
@@ -342,8 +343,9 @@ const MoviesAdmin = () => {
                 {/* Edit episode link inline */}
                 <div className="flex gap-2">
                   <Input
+                    key={ep.video_url || "empty"}
                     defaultValue={ep.video_url || ""}
-                    placeholder="Ссылка (Telegram/URL)"
+                    placeholder="Ссылка (Telegram/URL) или загрузите файл"
                     className="bg-background border-border text-xs h-8 flex-1"
                     onBlur={async (e) => {
                       const newUrl = e.target.value;
@@ -371,6 +373,16 @@ const MoviesAdmin = () => {
                     <span className="text-xs text-muted-foreground whitespace-nowrap">{ep.is_free ? "Free" : "VIP"}</span>
                   </div>
                 </div>
+                <VideoUploadButton
+                  label="Загрузить MP4 в приложение"
+                  onUploaded={async (storageUrl) => {
+                    await supabase.from("episodes").update({ video_url: storageUrl }).eq("id", ep.id);
+                    if (epMovie) {
+                      const { data } = await supabase.from("episodes").select("*").eq("movie_id", epMovie.id).order("part_number");
+                      setEpisodes((data || []) as Episode[]);
+                    }
+                  }}
+                />
               </div>
             ))}
             <div className="space-y-3 border-t border-border pt-4">
@@ -380,6 +392,10 @@ const MoviesAdmin = () => {
                 <Input placeholder="Название" value={epForm.title} onChange={(e) => setEpForm({ ...epForm, title: e.target.value })} className="bg-secondary border-border" />
               </div>
               <Input placeholder="Ссылка (напр. https://t.me/bot?start=...)" value={epForm.video_url} onChange={(e) => setEpForm({ ...epForm, video_url: e.target.value })} className="bg-secondary border-border" />
+              <VideoUploadButton
+                label="Или загрузить MP4 файл"
+                onUploaded={(storageUrl) => setEpForm((f) => ({ ...f, video_url: storageUrl }))}
+              />
               <div className="flex items-center gap-3">
                 <Input placeholder="Длительность" value={epForm.duration} onChange={(e) => setEpForm({ ...epForm, duration: e.target.value })} className="bg-secondary border-border flex-1" />
                 <div className="flex items-center gap-2">
