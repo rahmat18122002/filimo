@@ -373,6 +373,16 @@ const MoviesAdmin = () => {
                     <span className="text-xs text-muted-foreground whitespace-nowrap">{ep.is_free ? "Free" : "VIP"}</span>
                   </div>
                 </div>
+                <VideoUploadButton
+                  label="Загрузить MP4 в приложение"
+                  onUploaded={async (storageUrl) => {
+                    await supabase.from("episodes").update({ video_url: storageUrl }).eq("id", ep.id);
+                    if (epMovie) {
+                      const { data } = await supabase.from("episodes").select("*").eq("movie_id", epMovie.id).order("part_number");
+                      setEpisodes((data || []) as Episode[]);
+                    }
+                  }}
+                />
               </div>
             ))}
             <div className="space-y-3 border-t border-border pt-4">
