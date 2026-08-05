@@ -232,21 +232,21 @@ const MovieDetail = () => {
           <motion.div id="episode-player" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8">
             <h2 className="mb-4 text-xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>Сейчас: {selectedEp.title}</h2>
             <div className="aspect-video overflow-hidden rounded-2xl bg-black relative select-none">
-              {selectedEp.video_url ? (
-                getDirectVideoQualities(selectedEp.video_url).length > 0 ? (
+              {playUrl ? (
+                getDirectVideoQualities(playUrl).length > 0 ? (
                   <CustomVideoPlayer
-                    qualities={getDirectVideoQualities(selectedEp.video_url)}
+                    qualities={getDirectVideoQualities(playUrl)}
                     poster={movie.poster}
                     className="absolute inset-0 h-full w-full"
                   />
                 ) : (() => {
-                    const provider = getProvider(selectedEp.video_url);
+                    const provider = getProvider(playUrl);
                     const isTelegram = provider === "telegram";
                     return (
                       <>
                         {/* Iframe — for Telegram we shift it up to crop the channel header */}
                         <iframe
-                          src={getEmbedUrl(selectedEp.video_url)}
+                          src={getEmbedUrl(playUrl)}
                           className={isTelegram ? "absolute border-0" : "absolute inset-0 h-full w-full border-0"}
                           style={isTelegram ? { top: "-56px", left: 0, width: "100%", height: "calc(100% + 112px)" } : undefined}
                           allow="autoplay; encrypted-media; fullscreen; picture-in-picture; accelerometer; gyroscope"
@@ -261,7 +261,7 @@ const MovieDetail = () => {
                 <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
                   <div className="text-center">
                     <Play className="mx-auto mb-2 h-12 w-12" />
-                    <p>Видео скоро будет доступно</p>
+                    <p>{selectedEp.video_url ? "Загрузка…" : "Видео скоро будет доступно"}</p>
                   </div>
                 </div>
               )}
