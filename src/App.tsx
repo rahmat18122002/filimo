@@ -15,6 +15,8 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderHistory from "./pages/OrderHistory";
 import LiveTV from "./pages/LiveTV";
+import Profile from "./pages/Profile";
+import TopupsAdmin from "./pages/admin/TopupsAdmin";
 import AdminLogin from "./pages/AdminLogin";
 import AdminGuard from "./components/AdminGuard";
 import AdminLayout from "./components/admin/AdminLayout";
@@ -57,6 +59,7 @@ const App = () => (
           <Route path="/home" element={<Index />} />
           <Route path="/movie/:id" element={<MovieDetail />} />
           <Route path="/vip" element={<VipPurchase />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/live" element={<LiveTV />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/shop/:id" element={<ShopProductDetail />} />
@@ -75,6 +78,7 @@ const App = () => (
             <Route path="vip" element={<VipAdmin />} />
             <Route path="cards" element={<CardsAdmin />} />
             <Route path="payments" element={<PaymentsAdmin />} />
+            <Route path="topups" element={<TopupsAdmin />} />
             <Route path="slider" element={<SliderAdmin />} />
             <Route path="live-channels" element={<LiveChannelsAdmin />} />
             <Route path="stories" element={<StoriesAdmin />} />

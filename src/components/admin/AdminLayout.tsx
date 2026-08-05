@@ -17,6 +17,7 @@ import {
   ShoppingBag,
   ClipboardList,
   Store,
+  Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ const navItems = [
   { to: "/admin/vip", icon: Crown, label: "VIP-подписки" },
   { to: "/admin/cards", icon: CreditCard, label: "Карты оплаты" },
   { to: "/admin/payments", icon: ImageIcon, label: "Скриншоты оплат" },
+  { to: "/admin/topups", icon: Wallet, label: "💰 Пополнения" },
   { to: "/admin/slider", icon: ImageIcon, label: "Слайдер" },
   { to: "/admin/live-channels", icon: Satellite, label: "🛰️ Live TV" },
   { to: "/admin/stories", icon: BookOpen, label: "📖 Stories" },

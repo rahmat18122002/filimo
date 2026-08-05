@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { Film, Star, Clock, Share2, ChevronLeft, ChevronRight, Crown, Radio, Globe, Eye, ShoppingBag } from "lucide-react";
+import { Film, Star, Clock, Share2, ChevronLeft, ChevronRight, Crown, Radio, Globe, Eye, ShoppingBag, Wallet } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { isVip } from "@/lib/userStore";
 import HeroSlider from "@/components/HeroSlider";
@@ -418,6 +418,18 @@ const Index = () => {
             <span className={`text-[10px] font-bold ${user && isVip(user) ? "text-destructive" : "text-muted-foreground"}`}>{t("nav.live")}</span>
           </motion.button>
 
+          {/* Profile Button */}
+          <motion.button
+            onClick={() => navigate("/profile")}
+            className="flex flex-col items-center gap-1"
+            whileTap={{ scale: 0.9 }}
+          >
+            <div className="rounded-full bg-secondary p-2.5">
+              <Wallet className="h-5 w-5 text-muted-foreground" />
+            </div>
+            <span className="text-[10px] font-bold text-muted-foreground">Кабинет</span>
+          </motion.button>
+
           {/* Shop Button */}
           <motion.button
             onClick={() => navigate("/shop")}
@@ -429,6 +441,7 @@ const Index = () => {
             </div>
             <span className="text-[10px] font-bold text-muted-foreground">🛍️</span>
           </motion.button>
+
 
           {/* Language Button */}
           <motion.button
