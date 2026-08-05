@@ -37,6 +37,7 @@ export type Database = {
       }
       app_users: {
         Row: {
+          balance: number
           created_at: string
           device_id: string
           display_name: string | null
@@ -45,6 +46,7 @@ export type Database = {
           vip_until: string | null
         }
         Insert: {
+          balance?: number
           created_at?: string
           device_id: string
           display_name?: string | null
@@ -53,6 +55,7 @@ export type Database = {
           vip_until?: string | null
         }
         Update: {
+          balance?: number
           created_at?: string
           device_id?: string
           display_name?: string | null
@@ -61,6 +64,50 @@ export type Database = {
           vip_until?: string | null
         }
         Relationships: []
+      }
+      balance_topups: {
+        Row: {
+          amount: number
+          approved_amount: number | null
+          created_at: string
+          id: string
+          note: string | null
+          reviewed_at: string | null
+          screenshot_url: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          approved_amount?: number | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          reviewed_at?: string | null
+          screenshot_url: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          approved_amount?: number | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          reviewed_at?: string | null
+          screenshot_url?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "balance_topups_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       bot_channels: {
         Row: {
