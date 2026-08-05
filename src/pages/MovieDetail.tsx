@@ -50,7 +50,7 @@ const MovieDetail = () => {
       if (data) setEpisodes(data as Episode[]);
     });
     // Increment view count
-    supabase.rpc("increment_movie_views", { movie_id: id }).then(() => {});
+    supabase.from("movie_view_events").insert({ movie_id: id }).then(() => {});
     // Auto-register user if not yet registered (for shared links)
     autoRegister().then(setUser).catch(console.error);
   }, [id]);

@@ -1,15 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
+import { getDeviceId } from "@/lib/deviceId";
 
 const DEVICE_KEY = "kino_device_id";
 
-function getDeviceId(): string {
-  let id = localStorage.getItem(DEVICE_KEY);
-  if (!id) {
-    id = crypto.randomUUID();
-    localStorage.setItem(DEVICE_KEY, id);
-  }
-  return id;
-}
 
 export interface AppUser {
   id: string;
