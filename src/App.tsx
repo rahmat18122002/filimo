@@ -78,6 +78,7 @@ const App = () => (
             <Route path="vip" element={<VipAdmin />} />
             <Route path="cards" element={<CardsAdmin />} />
             <Route path="payments" element={<PaymentsAdmin />} />
+            <Route path="topups" element={<TopupsAdmin />} />
             <Route path="slider" element={<SliderAdmin />} />
             <Route path="live-channels" element={<LiveChannelsAdmin />} />
             <Route path="stories" element={<StoriesAdmin />} />
