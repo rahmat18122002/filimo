@@ -9,6 +9,7 @@ export interface AppUser {
   device_id: string;
   display_name: string | null;
   is_vip: boolean;
+  balance: number;
   vip_until: string | null;
   created_at: string;
 }
