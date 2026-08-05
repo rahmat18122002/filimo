@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { autoRegister, isVip, type AppUser } from "@/lib/userStore";
 import { useI18n, getLocalizedField } from "@/lib/i18n";
 import { CustomVideoPlayer, type VideoQuality } from "@/components/CustomVideoPlayer";
+import { resolveVideoUrl } from "@/lib/videoStorage";
 
 interface Movie {
   id: string;
