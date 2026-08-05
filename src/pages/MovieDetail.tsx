@@ -39,6 +39,24 @@ const MovieDetail = () => {
   const [selectedEp, setSelectedEp] = useState<Episode | null>(null);
   const [showVipWall, setShowVipWall] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const [playUrl, setPlayUrl] = useState<string | null>(null);
+
+  // Видеоҳои дар анбори барнома буда линки муваққатӣ мехоҳанд
+  useEffect(() => {
+    const raw = selectedEp?.video_url;
+    if (!raw) {
+      setPlayUrl(null);
+      return;
+    }
+    let cancelled = false;
+    setPlayUrl(null);
+    resolveVideoUrl(raw).then((url) => {
+      if (!cancelled) setPlayUrl(url || null);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedEp?.video_url]);
 
   useEffect(() => {
     if (!id) return;
