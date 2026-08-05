@@ -15,6 +15,8 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderHistory from "./pages/OrderHistory";
 import LiveTV from "./pages/LiveTV";
+import Profile from "./pages/Profile";
+import TopupsAdmin from "./pages/admin/TopupsAdmin";
 import AdminLogin from "./pages/AdminLogin";
 import AdminGuard from "./components/AdminGuard";
 import AdminLayout from "./components/admin/AdminLayout";
