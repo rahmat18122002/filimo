@@ -425,7 +425,7 @@ const Index = () => {
             whileTap={{ scale: 0.9 }}
           >
             <div className="rounded-full bg-secondary p-2.5">
-              <Wallet className="h-5 w-5 text-muted-foreground" />
+              <UserRound className="h-5 w-5 text-muted-foreground" />
             </div>
             <span className="text-[10px] font-bold text-muted-foreground">Кабинет</span>
           </motion.button>
