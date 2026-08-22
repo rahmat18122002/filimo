@@ -270,7 +270,7 @@ const MovieDetail = () => {
                 <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
                   <div className="text-center">
                     <Play className="mx-auto mb-2 h-12 w-12" />
-                    <p>{selectedEp.video_url ? "Загрузка…" : "Видео скоро будет доступно"}</p>
+                    <p>{playError ? "Не удалось получить видео. Обновите страницу." : selectedEp.video_url ? "Загрузка…" : "Видео скоро будет доступно"}</p>
                   </div>
                 </div>
               )}
