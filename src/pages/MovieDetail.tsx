@@ -41,23 +41,32 @@ const MovieDetail = () => {
   const [showVipWall, setShowVipWall] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [playUrl, setPlayUrl] = useState<string | null>(null);
+  const [playError, setPlayError] = useState(false);
 
   // Видеоҳои дар анбори барнома буда линки муваққатӣ мехоҳанд
   useEffect(() => {
     const raw = selectedEp?.video_url;
+    setPlayError(false);
     if (!raw) {
       setPlayUrl(null);
       return;
     }
     let cancelled = false;
     setPlayUrl(null);
-    resolveVideoUrl(raw).then((url) => {
-      if (!cancelled) setPlayUrl(url || null);
-    });
+    resolveVideoUrl(raw)
+      .then((url) => {
+        if (cancelled) return;
+        if (url) setPlayUrl(url);
+        else setPlayError(true);
+      })
+      .catch(() => {
+        if (!cancelled) setPlayError(true);
+      });
     return () => {
       cancelled = true;
     };
   }, [selectedEp?.video_url]);
+
 
   useEffect(() => {
     if (!id) return;
@@ -261,7 +270,7 @@ const MovieDetail = () => {
                 <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
                   <div className="text-center">
                     <Play className="mx-auto mb-2 h-12 w-12" />
-                    <p>{selectedEp.video_url ? "Загрузка…" : "Видео скоро будет доступно"}</p>
+                    <p>{playError ? "Не удалось получить видео. Обновите страницу." : selectedEp.video_url ? "Загрузка…" : "Видео скоро будет доступно"}</p>
                   </div>
                 </div>
               )}

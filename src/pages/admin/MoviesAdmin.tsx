@@ -154,7 +154,7 @@ const MoviesAdmin = () => {
 
   const addEpisode = async () => {
     if (!epMovie) return;
-    await supabase.from("episodes").insert({
+    const { error } = await supabase.from("episodes").insert({
       movie_id: epMovie.id,
       part_number: Number(epForm.part_number),
       title: epForm.title,
@@ -162,11 +162,16 @@ const MoviesAdmin = () => {
       is_free: epForm.is_free,
       duration: epForm.duration || null,
     });
+    if (error) {
+      toast({ title: "Ошибка сохранения серии", description: error.message, variant: "destructive" });
+      return;
+    }
     const { data } = await supabase.from("episodes").select("*").eq("movie_id", epMovie.id).order("part_number");
     setEpisodes((data || []) as Episode[]);
     setEpForm({ part_number: "", title: "", video_url: "", is_free: true, duration: "" });
     toast({ title: "Серия добавлена" });
   };
+
 
   const deleteEpisode = async (id: string) => {
     await supabase.from("episodes").delete().eq("id", id);
@@ -376,13 +381,19 @@ const MoviesAdmin = () => {
                 <VideoUploadButton
                   label="Загрузить MP4 в приложение"
                   onUploaded={async (storageUrl) => {
-                    await supabase.from("episodes").update({ video_url: storageUrl }).eq("id", ep.id);
+                    const { error } = await supabase.from("episodes").update({ video_url: storageUrl }).eq("id", ep.id);
+                    if (error) {
+                      toast({ title: "Видео загружено, но не сохранено", description: error.message, variant: "destructive" });
+                      return;
+                    }
                     if (epMovie) {
                       const { data } = await supabase.from("episodes").select("*").eq("movie_id", epMovie.id).order("part_number");
                       setEpisodes((data || []) as Episode[]);
                     }
+                    toast({ title: `Часть ${ep.part_number} готова к просмотру ✅` });
                   }}
                 />
+
               </div>
             ))}
             <div className="space-y-3 border-t border-border pt-4">
