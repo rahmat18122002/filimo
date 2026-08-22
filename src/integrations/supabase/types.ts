@@ -974,6 +974,53 @@ export type Database = {
           },
         ]
       }
+      telegram_admins: {
+        Row: {
+          chat_id: string
+          created_at: string
+          username: string | null
+        }
+        Insert: {
+          chat_id: string
+          created_at?: string
+          username?: string | null
+        }
+        Update: {
+          chat_id?: string
+          created_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      telegram_sessions: {
+        Row: {
+          chat_id: string
+          movie_id: string | null
+          step: string
+          updated_at: string
+        }
+        Insert: {
+          chat_id: string
+          movie_id?: string | null
+          step?: string
+          updated_at?: string
+        }
+        Update: {
+          chat_id?: string
+          movie_id?: string | null
+          step?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "telegram_sessions_movie_id_fkey"
+            columns: ["movie_id"]
+            isOneToOne: false
+            referencedRelation: "movies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
