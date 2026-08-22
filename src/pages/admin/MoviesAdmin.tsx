@@ -154,7 +154,7 @@ const MoviesAdmin = () => {
 
   const addEpisode = async () => {
     if (!epMovie) return;
-    await supabase.from("episodes").insert({
+    const { error } = await supabase.from("episodes").insert({
       movie_id: epMovie.id,
       part_number: Number(epForm.part_number),
       title: epForm.title,
@@ -162,11 +162,16 @@ const MoviesAdmin = () => {
       is_free: epForm.is_free,
       duration: epForm.duration || null,
     });
+    if (error) {
+      toast({ title: "Ошибка сохранения серии", description: error.message, variant: "destructive" });
+      return;
+    }
     const { data } = await supabase.from("episodes").select("*").eq("movie_id", epMovie.id).order("part_number");
     setEpisodes((data || []) as Episode[]);
     setEpForm({ part_number: "", title: "", video_url: "", is_free: true, duration: "" });
     toast({ title: "Серия добавлена" });
   };
+
 
   const deleteEpisode = async (id: string) => {
     await supabase.from("episodes").delete().eq("id", id);
