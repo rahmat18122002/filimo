@@ -9,6 +9,7 @@ interface SliderItem {
   title: string;
   subtitle: string | null;
   image_url: string;
+  video_url: string | null;
   movie_id: string | null;
 }
 
@@ -47,23 +48,40 @@ const HeroSlider = () => {
   const item = items[current];
 
   return (
-    <section className="relative w-full p-[2px] rounded-2xl overflow-hidden hero-slider-glow">
+    <section className="relative mx-auto w-full max-w-[720px] lg:max-w-[860px] p-[2px] rounded-2xl overflow-hidden hero-slider-glow">
       {/* Animated gradient border */}
       <div className="absolute inset-0 rounded-2xl hero-border-anim" aria-hidden="true" />
 
-      <div className="relative w-full overflow-hidden rounded-2xl bg-background" style={{ aspectRatio: "16 / 9" }}>
+      <div className="relative w-full overflow-hidden rounded-2xl bg-background md:max-h-[48vh]" style={{ aspectRatio: "16 / 9" }}>
       <AnimatePresence mode="wait">
-        <motion.img
-          key={item.id}
-          src={item.image_url}
-          alt={item.title}
-          initial={{ opacity: 0, scale: 1.1 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.7 }}
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ filter: "brightness(1.1) saturate(1.15) contrast(1.05)" }}
-        />
+        {item.video_url ? (
+          <motion.video
+            key={item.id}
+            src={item.video_url}
+            autoPlay
+            muted
+            loop
+            playsInline
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.7 }}
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ filter: "brightness(1.1) saturate(1.15) contrast(1.05)" }}
+          />
+        ) : (
+          <motion.img
+            key={item.id}
+            src={item.image_url}
+            alt={item.title}
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.7 }}
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ filter: "brightness(1.1) saturate(1.15) contrast(1.05)" }}
+          />
+        )}
       </AnimatePresence>
       {/* Light bottom-only gradient so text stays readable but image stays bright */}
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-background/80 via-background/30 to-transparent" />
