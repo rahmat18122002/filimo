@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Trash2, Plus, Image as ImageIcon } from "lucide-react";
+import { Trash2, Plus, Image as ImageIcon, Clapperboard } from "lucide-react";
+import VideoUploadButton from "@/components/admin/VideoUploadButton";
 import { useToast } from "@/hooks/use-toast";
 import {
   Select,
@@ -19,6 +20,7 @@ interface SliderItem {
   title: string;
   subtitle: string | null;
   image_url: string;
+  video_url: string | null;
   movie_id: string | null;
   sort_order: number;
   is_active: boolean;
@@ -37,6 +39,7 @@ const SliderAdmin = () => {
   const [movieId, setMovieId] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [videoUrl, setVideoUrl] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -93,6 +96,7 @@ const SliderAdmin = () => {
         title: title.trim(),
         subtitle: subtitle.trim() || null,
         image_url: urlData.publicUrl,
+        video_url: videoUrl || null,
         movie_id: movieId || null,
         sort_order: items.length,
       });
@@ -105,6 +109,7 @@ const SliderAdmin = () => {
       setMovieId("");
       setImageFile(null);
       setImagePreview("");
+      setVideoUrl("");
       fetchItems();
     } catch (err: any) {
       toast({ title: "Ошибка", description: err.message, variant: "destructive" });
@@ -171,6 +176,17 @@ const SliderAdmin = () => {
             </div>
           </div>
 
+          <div className="space-y-2">
+            <Label>Трейлер (видео из галереи, необязательно)</Label>
+            <VideoUploadButton
+              label="Загрузить трейлер"
+              onUploaded={(url) => setVideoUrl(url)}
+            />
+            {videoUrl && (
+              <video src={videoUrl} className="h-24 rounded-lg object-cover" muted controls />
+            )}
+          </div>
+
           <Button onClick={handleAdd} disabled={loading}>
             <Plus className="h-4 w-4 mr-2" />
             {loading ? "Загрузка..." : "Добавить слайд"}
@@ -204,6 +220,11 @@ const SliderAdmin = () => {
                 <p className="font-medium text-foreground truncate">{item.title}</p>
                 {item.subtitle && (
                   <p className="text-sm text-muted-foreground truncate">{item.subtitle}</p>
+                )}
+                {item.video_url && (
+                  <span className="mt-1 inline-flex items-center gap-1 text-xs text-primary">
+                    <Clapperboard className="h-3 w-3" /> Трейлер
+                  </span>
                 )}
               </div>
               <Button
