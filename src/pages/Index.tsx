@@ -236,6 +236,17 @@ const Index = () => {
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {user && <NotificationBell userId={user.id} />}
+            <motion.button
+              onClick={() => navigate("/profile")}
+              whileTap={{ scale: 0.9 }}
+              className="flex flex-col items-center gap-0.5"
+              aria-label="Кабинет"
+            >
+              <div className="rounded-full bg-secondary p-2">
+                <UserRound className="h-5 w-5 text-primary" />
+              </div>
+              <span className="text-[9px] font-bold text-primary">Кабинет</span>
+            </motion.button>
           </div>
         </div>
       </header>
