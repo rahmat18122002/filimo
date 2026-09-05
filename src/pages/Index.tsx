@@ -223,8 +223,10 @@ const Index = () => {
       <header className="relative z-20 w-full bg-background">
         <div className="container mx-auto flex items-center gap-3 px-4 py-3">
           <div className="flex items-center gap-2 shrink-0">
-            <Film className="h-6 w-6 text-primary" />
-            <span className="text-lg font-bold text-foreground tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <div className="rounded-lg border border-primary/60 bg-primary/10 p-1.5">
+              <Film className="h-5 w-5 text-primary" />
+            </div>
+            <span className="text-lg font-bold text-primary tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
               {appName}
             </span>
           </div>
