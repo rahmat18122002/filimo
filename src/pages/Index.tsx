@@ -180,6 +180,7 @@ const Index = () => {
   const [categories, setCategories] = useState<DBCategory[]>([]);
   const [carouselSpeed, setCarouselSpeed] = useState(5);
   const [appName, setAppName] = useState("Filimo");
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [showLangPicker, setShowLangPicker] = useState(false);
   const navigate = useNavigate();
 
@@ -222,8 +223,10 @@ const Index = () => {
       <header className="relative z-20 w-full bg-background">
         <div className="container mx-auto flex items-center gap-3 px-4 py-3">
           <div className="flex items-center gap-2 shrink-0">
-            <Film className="h-6 w-6 text-primary" />
-            <span className="text-lg font-bold text-foreground tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <div className="rounded-lg border border-primary/60 bg-primary/10 p-1.5">
+              <Film className="h-5 w-5 text-primary" />
+            </div>
+            <span className="text-lg font-bold text-primary tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
               {appName}
             </span>
           </div>
@@ -237,18 +240,50 @@ const Index = () => {
         </div>
       </header>
 
+      {/* Search bar */}
+      <div className="container mx-auto px-4 sm:px-6 pt-3">
+        <SearchBar value={search} onChange={setSearch} />
+      </div>
+
+      {/* Category chips */}
+      {!search && categories.length > 0 && (
+        <div className="container mx-auto px-4 sm:px-6 pt-3">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+            <button
+              onClick={() => setActiveCategory(null)}
+              className={`shrink-0 whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-colors ${
+                activeCategory === null
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t("movies.all")}
+            </button>
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(activeCategory === cat.name ? null : cat.name)}
+                className={`shrink-0 whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-colors ${
+                  activeCategory === cat.name
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {getLocalizedField(cat, "name", lang)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="px-3 sm:px-6 pt-3 sm:pt-5">
-        <div className="relative overflow-hidden rounded-2xl border border-border/50 shadow-glow ring-1 ring-primary/20">
+        <div className="relative overflow-hidden rounded-2xl border border-border/50 shadow-glow ring-1 ring-primary/20 mx-auto max-w-[720px] lg:max-w-[860px]">
           <HeroSlider />
         </div>
       </div>
 
       {/* Catalog Section */}
       <main id="catalog" className="container mx-auto px-6 py-12">
-        <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <SearchBar value={search} onChange={setSearch} />
-        </div>
-
         {/* All movies grid when searching */}
         {search && (
           searchFiltered.length > 0 ? (
@@ -294,14 +329,61 @@ const Index = () => {
           )
         )}
 
+        {/* Selected category grid */}
+        {!search && activeCategory && (
+          <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+            {searchFiltered.filter((m) => m.genre.includes(activeCategory)).map((movie, i) => (
+              <motion.div
+                key={movie.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: i * 0.05 }}
+                whileHover={{ y: -8 }}
+                className="group cursor-pointer"
+                onClick={() => navigate(`/movie/${movie.id}`)}
+              >
+                <div className="relative overflow-hidden rounded-2xl shadow-card">
+                  <div className="aspect-[2/3] overflow-hidden rounded-2xl bg-secondary">
+                    {movie.poster ? (
+                      <img src={movie.poster} alt={movie.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center"><Film className="h-10 w-10 text-muted-foreground" /></div>
+                    )}
+                  </div>
+                  <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-background/80 px-2.5 py-1 backdrop-blur-sm">
+                    <Star className="h-3 w-3 fill-accent text-accent" />
+                    <span className="text-xs font-semibold text-foreground">{movie.rating}</span>
+                  </div>
+                </div>
+                <div className="mt-3 px-1">
+                  <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-1">{getLocalizedField(movie, "title", lang)}</h3>
+                  <div className="mt-2 flex items-center justify-between">
+                    <ViewCount count={movie.view_count} />
+                    <Share2 className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+
         {/* Category carousels when not searching */}
-        {!search && (
+        {!search && !activeCategory && (
           <div className="space-y-10">
             {moviesByCategory.map(({ category, movies: catMovies }) => (
               <section key={category.id}>
-                <h2 className="mb-4 text-xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>
-                  {getLocalizedField(category, "name", lang)}
-                </h2>
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>
+                    {getLocalizedField(category, "name", lang)}
+                  </h2>
+                  <button
+                    onClick={() => setActiveCategory(category.name)}
+                    className="flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+                  >
+                    Смотреть все
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
                 <MovieCarousel movies={catMovies} carouselSpeed={carouselSpeed} lang={lang} />
               </section>
             ))}
