@@ -180,6 +180,7 @@ const Index = () => {
   const [categories, setCategories] = useState<DBCategory[]>([]);
   const [carouselSpeed, setCarouselSpeed] = useState(5);
   const [appName, setAppName] = useState("Filimo");
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [showLangPicker, setShowLangPicker] = useState(false);
   const navigate = useNavigate();
 
@@ -237,18 +238,50 @@ const Index = () => {
         </div>
       </header>
 
+      {/* Search bar */}
+      <div className="container mx-auto px-4 sm:px-6 pt-3">
+        <SearchBar value={search} onChange={setSearch} />
+      </div>
+
+      {/* Category chips */}
+      {!search && categories.length > 0 && (
+        <div className="container mx-auto px-4 sm:px-6 pt-3">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+            <button
+              onClick={() => setActiveCategory(null)}
+              className={`shrink-0 whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-colors ${
+                activeCategory === null
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t("movies.all")}
+            </button>
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(activeCategory === cat.name ? null : cat.name)}
+                className={`shrink-0 whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-colors ${
+                  activeCategory === cat.name
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {getLocalizedField(cat, "name", lang)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="px-3 sm:px-6 pt-3 sm:pt-5">
-        <div className="relative overflow-hidden rounded-2xl border border-border/50 shadow-glow ring-1 ring-primary/20">
+        <div className="relative overflow-hidden rounded-2xl border border-border/50 shadow-glow ring-1 ring-primary/20 mx-auto max-w-[720px] lg:max-w-[860px]">
           <HeroSlider />
         </div>
       </div>
 
       {/* Catalog Section */}
       <main id="catalog" className="container mx-auto px-6 py-12">
-        <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <SearchBar value={search} onChange={setSearch} />
-        </div>
-
         {/* All movies grid when searching */}
         {search && (
           searchFiltered.length > 0 ? (
