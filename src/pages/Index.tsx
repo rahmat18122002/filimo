@@ -327,14 +327,61 @@ const Index = () => {
           )
         )}
 
+        {/* Selected category grid */}
+        {!search && activeCategory && (
+          <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+            {searchFiltered.filter((m) => m.genre.includes(activeCategory)).map((movie, i) => (
+              <motion.div
+                key={movie.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: i * 0.05 }}
+                whileHover={{ y: -8 }}
+                className="group cursor-pointer"
+                onClick={() => navigate(`/movie/${movie.id}`)}
+              >
+                <div className="relative overflow-hidden rounded-2xl shadow-card">
+                  <div className="aspect-[2/3] overflow-hidden rounded-2xl bg-secondary">
+                    {movie.poster ? (
+                      <img src={movie.poster} alt={movie.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center"><Film className="h-10 w-10 text-muted-foreground" /></div>
+                    )}
+                  </div>
+                  <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-background/80 px-2.5 py-1 backdrop-blur-sm">
+                    <Star className="h-3 w-3 fill-accent text-accent" />
+                    <span className="text-xs font-semibold text-foreground">{movie.rating}</span>
+                  </div>
+                </div>
+                <div className="mt-3 px-1">
+                  <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-1">{getLocalizedField(movie, "title", lang)}</h3>
+                  <div className="mt-2 flex items-center justify-between">
+                    <ViewCount count={movie.view_count} />
+                    <Share2 className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+
         {/* Category carousels when not searching */}
-        {!search && (
+        {!search && !activeCategory && (
           <div className="space-y-10">
             {moviesByCategory.map(({ category, movies: catMovies }) => (
               <section key={category.id}>
-                <h2 className="mb-4 text-xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>
-                  {getLocalizedField(category, "name", lang)}
-                </h2>
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>
+                    {getLocalizedField(category, "name", lang)}
+                  </h2>
+                  <button
+                    onClick={() => setActiveCategory(category.name)}
+                    className="flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+                  >
+                    Смотреть все
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
                 <MovieCarousel movies={catMovies} carouselSpeed={carouselSpeed} lang={lang} />
               </section>
             ))}
